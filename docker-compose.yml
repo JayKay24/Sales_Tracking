@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  mongo_database:
+  server_database:
     image: mongo:latest
     ports:
       - "27017:27017"
@@ -9,9 +9,17 @@ services:
       - incourage-data:/data/db
     restart: always
 
+  sales_database:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    volumes:
+      - incourage-data:/data/db
+    restart: always
+
   background_service:
     depends_on:
-      - mongo_database
+      - sales_database
     image: jaykay24/incourage-server-docker:1.0.0
     ports:
       - "3000:3000"
