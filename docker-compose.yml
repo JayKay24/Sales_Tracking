@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  mongo_database:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - incourage-data:/data/db
+    restart: always
+
+  background_service:
+    depends_on:
+      - mongo_database
+    image: jaykay24/incourage-server-docker:1.0.0
+    ports:
+      - "3000:3000"
+    environment:
+      - "CONN_STR_LOCAL=${CONN_STR_LOCAL}"
+      - "JWT_SECRET=${JWT_SECRET}"
+      - "DB_PASSWORD=${DB_PASSWORD}"
+      - "NODE_ENV=${NODE_ENV}"
+    restart: always
+
+  server:
+    depends_on:
+      - background_service
+    image: jaykay24/incourage-jobs-docker:1.0.0
+    ports:
+      - "4000:4000"
+    environment:
+      - "CONN_STR_LOCAL=${CONN_STR_LOCAL}"
+      - "JWT_SECRET=${JWT_SECRET}"
+      - "DB_PASSWORD=${DB_PASSWORD}"
+      - "NODE_ENV=${NODE_ENV}"
+    restart: always
+volumes:
+  incourage-data:
