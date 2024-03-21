@@ -17,10 +17,10 @@ services:
       - incourage-olap-data:/data/db
     restart: always
 
-  background_service:
+  jobs_service:
     depends_on:
       - sales_database
-    image: jaykay24/incourage-server-docker:1.0.0
+    image: jaykay24/incourage-jobs-docker:1.0.0
     ports:
       - "3000:3000"
     environment:
@@ -32,8 +32,8 @@ services:
 
   server:
     depends_on:
-      - background_service
-    image: jaykay24/incourage-jobs-docker:1.0.0
+      - jobs_service
+    image: jaykay24/incourage-server-docker:1.0.0
     ports:
       - "4000:4000"
     environment:
