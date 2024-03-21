@@ -1,10 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import VARS_CONFIG from '../config';
+import { extractVars } from '../config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  console.log('env vars here', VARS_CONFIG);
+  extractVars().then((content) => {
+    console.log('env vars here', content);
+  });
   await app.listen(4000);
 }
 bootstrap();

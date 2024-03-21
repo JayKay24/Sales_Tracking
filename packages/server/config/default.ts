@@ -1,7 +1,7 @@
 import { IConfig } from './iConfig';
 
 const defConfig: IConfig = {
-  port: 3000,
+  ENV: 'development',
 };
 
 export { defConfig };
