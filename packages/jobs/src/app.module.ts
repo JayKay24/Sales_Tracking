@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { extractVars } from 'config';
+import { extractVars } from './config';
 
 async function getConnString() {
   const configs = await extractVars();

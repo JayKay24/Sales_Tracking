@@ -6,7 +6,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 
 import * as dotenv from 'dotenv';
-import { extractVars } from 'config';
+import { extractVars } from './config';
 
 dotenv.config();
 
