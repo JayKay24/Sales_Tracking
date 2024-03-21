@@ -14,7 +14,9 @@ async function extractVars() {
   try {
     envConfig = await getAppEnvContent(path.join(__dirname, `${ENV}`));
 
-    return { ...defConfig, ...envConfig };
+    const configObj = { ...defConfig, ...envConfig };
+
+    return configObj;
   } catch (e) {
     console.log('Problem with sourcing env vars');
     console.log(e);
