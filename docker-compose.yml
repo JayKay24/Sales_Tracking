@@ -6,7 +6,7 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - incourage-data:/data/db
+      - incourage-oltp-data:/data/db
     restart: always
 
   sales_database:
@@ -14,7 +14,7 @@ services:
     ports:
       - "27018:27017"
     volumes:
-      - incourage-data:/data/db
+      - incourage-olap-data:/data/db
     restart: always
 
   background_service:
@@ -43,4 +43,5 @@ services:
       - "NODE_ENV=${NODE_ENV}"
     restart: always
 volumes:
-  incourage-data:
+  incourage-oltp-data:
+  incourage-olap-data:
