@@ -41,15 +41,4 @@ export class UserService {
       county: user.county,
     };
   }
-
-  async updateUser(
-    id: string,
-    firstName: string,
-    lastName: string,
-    email: string,
-    password: string,
-    role: UserRole,
-    phone_number: string,
-    county: string = '',
-  ) {}
 }
