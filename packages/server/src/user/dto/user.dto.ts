@@ -37,7 +37,7 @@ export class UserDtoCreate {
   password: string;
 
   @IsNotEmpty()
-  @IsIn([UserRole.ADMIN, UserRole.AGENT, UserRole.CUSTOMER])
+  @IsIn([UserRole.CUSTOMER])
   role: UserRole;
 
   @IsNotEmpty()
@@ -48,4 +48,10 @@ export class UserDtoCreate {
   @MinLength(4)
   @MaxLength(40)
   county: string;
+}
+
+export class AgentDtoCreate extends UserDtoCreate {
+  @IsNotEmpty()
+  @IsIn([UserRole.AGENT])
+  role: UserRole;
 }
