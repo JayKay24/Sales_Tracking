@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from './user.service';
 import { AgentDtoCreate, UserDtoCreate } from './dto/user.dto';
 import { ConfigService } from '@nestjs/config';
-import { JwtAuthGuard } from 'auth/jwt.guard';
+import { JwtAuthGuard } from '../auth/jwt.guard';
 
 @Controller('api/v1/users')
 export class UserController {
@@ -28,7 +28,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('admin/users')
+  @Post('admin')
   async addAgent(
     @Body() agent: AgentDtoCreate,
     @Headers('Authorization') token: string,
