@@ -4,25 +4,28 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { ConfigService } from './config/config.service';
 
 import * as dotenv from 'dotenv';
-import { extractVars } from './config';
 
 dotenv.config();
 
-async function getConnString() {
-  const configs = await extractVars();
+async function getConnString(configService: ConfigService) {
+  const connString = await configService.getConnString();
 
-  return { uri: configs.db_conn_string };
+  return { uri: connString };
 }
 
 @Module({
   imports: [
-    MongooseModule.forRootAsync({ useFactory: getConnString }),
+    MongooseModule.forRootAsync({
+      useFactory: getConnString,
+      inject: [ConfigService],
+    }),
     UserModule,
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ConfigService],
 })
 export class AppModule {}

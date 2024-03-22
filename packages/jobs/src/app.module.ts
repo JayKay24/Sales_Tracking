@@ -2,21 +2,25 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { extractVars } from './config';
+import { ConfigService } from './config/config.service';
 
-async function getConnString() {
-  const configs = await extractVars();
+import * as dotenv from 'dotenv';
 
-  return { uri: configs.db_conn_string };
+dotenv.config();
+
+async function getConnString(configService: ConfigService) {
+  const connString = await configService.getConnString();
+  return { uri: connString };
 }
 
 @Module({
   imports: [
     MongooseModule.forRootAsync({
       useFactory: getConnString,
+      inject: [ConfigService],
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ConfigService],
 })
 export class AppModule {}

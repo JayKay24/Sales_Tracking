@@ -24,7 +24,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - "CONN_STR_LOCAL=${CONN_STR_LOCAL}"
+      - "JOBS_CONN_STR_LOCAL=${JOBS_CONN_STR_LOCAL}"
       - "DB_PASSWORD=${DB_PASSWORD}"
       - "NODE_ENV=${NODE_ENV}"
     restart: always

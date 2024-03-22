@@ -3,7 +3,7 @@ import { IConfig } from './iConfig';
 import { defConfig } from './default';
 
 async function getAppEnvContent(filePath): Promise<IConfig> {
-  const { default: defaultContent } = await import(filePath);
+  const { default: defaultContent } = await import(`./${filePath}`);
   return defaultContent;
 }
 
@@ -12,7 +12,7 @@ async function extractVars() {
   let envConfig: IConfig;
 
   try {
-    envConfig = await getAppEnvContent(path.join(__dirname, `${ENV}`));
+    envConfig = await getAppEnvContent(path.join('.', `${ENV}`));
 
     const configObj = { ...defConfig, ...envConfig };
 
