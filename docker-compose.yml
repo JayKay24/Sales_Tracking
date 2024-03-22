@@ -4,15 +4,15 @@ services:
   sales_database:
     image: mongo:latest
     ports:
-      - "27017:27017"
+      - "3100:27017"
     volumes:
       - incourage-olap-data:/data/db
     restart: always
 
-  server_database:
+  server_oltp_database:
     image: mongo:latest
     ports:
-      - "27018:27017"
+      - "3200:27017"
     volumes:
       - incourage-oltp-data:/data/db
     restart: always
@@ -31,7 +31,7 @@ services:
 
   server:
     depends_on:
-      - jobs_service
+      - server_oltp_database
     image: jaykay24/incourage-server-docker:1.0.0
     ports:
       - "4000:4000"
