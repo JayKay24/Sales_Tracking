@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Model } from 'mongoose';
 import { User, UserRole } from './user.schema';
 
@@ -40,5 +44,46 @@ export class UserService {
       email: user.email,
       county: user.county,
     };
+  }
+
+  async addAgent(
+    userId: string,
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string,
+    role: UserRole,
+    phoneNumber: string,
+    county: string,
+  ) {
+    let currentUser;
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      currentUser = await this.findUser(userId);
+    } catch (error) {
+      throw new NotFoundException('Only admins allowed to add agents');
+    }
+
+    return this.addUser(
+      firstName,
+      lastName,
+      email,
+      password,
+      role,
+      phoneNumber,
+      county,
+    );
+  }
+
+  private async findUser(userId: string): Promise<User> {
+    let user;
+
+    try {
+      user = await this.userModel.findById(userId);
+    } catch (error) {
+      throw new NotFoundException('Could not find user');
+    }
+
+    return user;
   }
 }
