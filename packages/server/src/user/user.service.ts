@@ -8,10 +8,11 @@ import { User, UserRole } from './user.schema';
 
 import * as bcrypt from 'bcrypt';
 import { saltOrRounds } from 'auth/auth.service';
+import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userModel: Model<User>) {}
+  constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
 
   async addUser(
     firstName: string,
