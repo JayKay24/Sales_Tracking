@@ -15,6 +15,9 @@ class User {
   email: string;
 
   @Prop({ required: true })
+  password: string;
+
+  @Prop({ required: true })
   role: string;
 
   @Prop({ required: true })
@@ -26,4 +29,4 @@ class User {
 
 const UserSchema = SchemaFactory.createForClass(User);
 
-export { UserSchema, UserDocument };
+export { UserSchema, UserDocument, User };
