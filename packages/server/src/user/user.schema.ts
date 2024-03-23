@@ -9,7 +9,7 @@ enum UserRole {
 
 type UserDocument = HydratedDocument<User>;
 
-@Schema()
+@Schema({ timestamps: true })
 class User {
   @Prop({ required: true })
   first_name: string;
