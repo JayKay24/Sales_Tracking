@@ -29,4 +29,4 @@ class Product {
 
 const ProductSchema = SchemaFactory.createForClass(Product);
 
-export { ProductSchema, ProductDocument, ProductCategory };
+export { ProductSchema, ProductDocument, ProductCategory, Product };
