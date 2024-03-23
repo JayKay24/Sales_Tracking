@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Headers,
   Param,
   Patch,
@@ -36,7 +37,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('admin')
+  @Post('admins')
   async addAgent(
     @Body() agent: AgentDtoCreate,
     @Headers('Authorization') token: string,
@@ -54,6 +55,15 @@ export class UserController {
     );
 
     return newAgent;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('agents')
+  async assignProducts(@Headers('Authorization') token: string) {
+    const payload = this.extractPayload(token);
+    const products = this.userService.assignProducts(payload.email);
+
+    return products;
   }
 
   @UseGuards(JwtAuthGuard)
