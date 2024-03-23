@@ -9,14 +9,13 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product, ProductCategory, ProductDocument } from './product.schema';
-import { User, UserRole } from 'user/user.schema';
+import { UserRole } from 'user/user.schema';
 import { UserService } from 'user/user.service';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectModel('Product') private readonly productModel: Model<Product>,
-    @InjectModel('User') private readonly userModel: Model<User>,
     private userService: UserService,
   ) {}
 
