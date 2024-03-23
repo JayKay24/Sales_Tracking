@@ -69,6 +69,23 @@ export class ProductService {
     });
   }
 
+  async getproductsByAgent(email: string) {
+    const user = await this.userService.findUserByEmail(email);
+    if (user.role !== UserRole.AGENT) {
+      throw new ForbiddenException('Only agents can view their products');
+    }
+    const prods = await this.productModel
+      .find({ agent: { $eq: user._id } })
+      .exec();
+
+    return prods.map((prod) => ({
+      id: prod._id,
+      name: prod.name,
+      category: prod.category,
+      price: prod.price,
+    }));
+  }
+
   async assignProduct(email: string) {
     const user = await this.userService.findUserByEmail(email);
     const res = await this.productModel
