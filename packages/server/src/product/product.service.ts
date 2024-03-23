@@ -1,12 +1,18 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product, ProductCategory } from './product.schema';
+import { User } from 'user/user.schema';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectModel('Product') private readonly productModel: Model<Product>,
+    @InjectModel('User') private readonly userModel: Model<User>,
   ) {}
 
   async addProduct(name: string, category: ProductCategory, price: number) {
@@ -33,7 +39,7 @@ export class ProductService {
 
   async getProducts() {
     const prods = await this.productModel
-      .find({ agent_id: { $ne: null } })
+      .find({ agent: { $ne: null } })
       .populate('agent', 'first_name', 'last_name', 'email')
       .exec();
 
@@ -47,5 +53,29 @@ export class ProductService {
     });
   }
 
-  async getProduct() {}
+  async assignProduct(email: string) {
+    const user = await this.userModel.findOne({ email }).exec();
+    const res = await this.productModel
+      .updateMany({ agent: { $eq: null } }, { agent: user })
+      .limit(2)
+      .exec();
+
+    if (!res.acknowledged) {
+      throw new InternalServerErrorException(
+        `Could not assign products to the agent of the email, ${email}`,
+      );
+    }
+
+    const prods = await this.productModel
+      .find({ agent: { $eq: user._id } })
+      .populate('agent', 'first_name', 'last_name', 'email')
+      .exec();
+
+    return prods.map((prod) => {
+      prod.id = prod._id.toString();
+      delete prod._id;
+
+      return prod;
+    });
+  }
 }

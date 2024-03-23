@@ -10,10 +10,14 @@ import { User, UserDocument, UserRole } from './user.schema';
 import * as bcrypt from 'bcrypt';
 import { saltOrRounds } from 'auth/auth.service';
 import { InjectModel } from '@nestjs/mongoose';
+import { ProductService } from 'product/product.service';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
+  constructor(
+    @InjectModel('User') private readonly userModel: Model<User>,
+    private productService: ProductService,
+  ) {}
 
   async addUser(
     firstName: string,
@@ -135,6 +139,18 @@ export class UserService {
       }
       throw new NotFoundException(`user with id ${userId} not found`);
     }
+  }
+
+  async assignProducts(email: string) {
+    const user = await this.userModel.findOne({ email }).exec();
+    if (user.role !== UserRole.AGENT) {
+      throw new ForbiddenException(
+        'Only agents can assign themselves to products to sell. 2 at a time.',
+      );
+    }
+    const prods = this.productService.assignProduct(email);
+
+    return prods;
   }
 
   private async findUser(userId: string): Promise<UserDocument> {
