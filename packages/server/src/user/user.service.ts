@@ -34,6 +34,7 @@ export class UserService {
       role: role,
       phone_number: phoneNumber,
       password: hashedPassword,
+      email,
       county,
     });
     const user = await newUser.save();

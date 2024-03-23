@@ -39,6 +39,7 @@ services:
       - "CONN_STR_LOCAL=${CONN_STR_LOCAL}"
       - "JWT_SECRET=${JWT_SECRET}"
       - "DB_PASSWORD=${DB_PASSWORD}"
+      - "JWT_EXPIRY=${JWT_EXPIRY}"
       - "NODE_ENV=${NODE_ENV}"
     restart: always
 volumes:

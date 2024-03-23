@@ -1,11 +1,12 @@
-import { Body, Controller, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/auth.dto';
 
-@Controller('auth')
+@Controller('api/v1/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @Post()
   async login(@Body() creds: LoginDto) {
     try {
       const validUser = await this.authService.validateUser(
