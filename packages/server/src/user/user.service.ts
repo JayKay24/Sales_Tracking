@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { User, UserRole } from './user.schema';
+import { User, UserDocument, UserRole } from './user.schema';
 
 import * as bcrypt from 'bcrypt';
 import { saltOrRounds } from 'auth/auth.service';
@@ -77,15 +77,67 @@ export class UserService {
     );
   }
 
-  private async findUser(userId: string): Promise<User> {
-    let user;
-
+  async updateUser(
+    userId,
+    firstName = '',
+    lastName = '',
+    email = '',
+    password = '',
+    phoneNumber = '',
+    county = '',
+  ) {
     try {
-      user = await this.userModel.findById(userId);
-    } catch (error) {
-      throw new NotFoundException('Could not find user');
-    }
+      const user = await this.findUser(userId);
 
-    return user;
+      if (firstName) {
+        user.first_name = firstName;
+      }
+
+      if (lastName) {
+        user.last_name = lastName;
+      }
+
+      if (email) {
+        user.email = email;
+      }
+
+      if (password) {
+        const hashedPassword = await bcrypt.hash(password, saltOrRounds);
+        user.password = hashedPassword;
+      }
+
+      if (phoneNumber) {
+        user.phone_number = phoneNumber;
+      }
+
+      if (county) {
+        user.county = county;
+      }
+
+      await user.save();
+
+      return {
+        id: user._id.toString(),
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        phoneNumber: user.phone_number,
+        county: user.county,
+      };
+    } catch (error) {
+      throw new NotFoundException(`user with id ${userId} not found`);
+    }
+  }
+
+  private async findUser(userId: string): Promise<UserDocument> {
+    try {
+      const user = await this.userModel.findById(userId).exec();
+      if (!user) {
+        throw new NotFoundException();
+      }
+      return user;
+    } catch (error) {
+      throw new NotFoundException(`user with id ${userId} not found`);
+    }
   }
 }
