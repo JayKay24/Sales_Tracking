@@ -24,7 +24,7 @@ class Product {
   price: number;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-  agent_id: User;
+  agent: User;
 }
 
 const ProductSchema = SchemaFactory.createForClass(Product);

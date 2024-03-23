@@ -30,4 +30,22 @@ export class ProductService {
       price: prod.price,
     };
   }
+
+  async getProducts() {
+    const prods = await this.productModel
+      .find({ agent_id: { $ne: null } })
+      .populate('agent', 'first_name', 'last_name', 'email')
+      .exec();
+
+    return prods.map((prod) => {
+      return {
+        id: prod._id.toString(),
+        name: prod.name,
+        category: prod.category,
+        price: prod.price,
+      };
+    });
+  }
+
+  async getProduct() {}
 }
