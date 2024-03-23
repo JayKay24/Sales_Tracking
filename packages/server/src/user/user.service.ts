@@ -162,7 +162,7 @@ export class UserService {
 
     const prods = await this.productModel
       .find({ agent: { $eq: user._id } })
-      .populate('agent', 'first_name', 'last_name', 'email')
+      .populate('agent')
       .exec();
 
     return prods.map((prod) => {

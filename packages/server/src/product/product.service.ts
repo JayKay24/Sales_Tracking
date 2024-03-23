@@ -54,7 +54,7 @@ export class ProductService {
   async getProducts() {
     const prods = await this.productModel
       .find({ agent: { $ne: null } })
-      .populate('agent', 'first_name', 'last_name', 'email')
+      .populate('agent')
       .exec();
 
     return prods.map((prod) => {
