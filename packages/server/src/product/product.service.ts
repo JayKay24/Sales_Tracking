@@ -3,7 +3,6 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -83,32 +82,6 @@ export class ProductService {
       category: prod.category,
       price: prod.price,
     }));
-  }
-
-  async assignProduct(email: string) {
-    const user = await this.userService.findUserByEmail(email);
-    const res = await this.productModel
-      .updateMany({ agent: { $eq: null } }, { agent: user })
-      .limit(2)
-      .exec();
-
-    if (!res.acknowledged) {
-      throw new InternalServerErrorException(
-        `Could not assign products to the agent of the email, ${email}`,
-      );
-    }
-
-    const prods = await this.productModel
-      .find({ agent: { $eq: user._id } })
-      .populate('agent', 'first_name', 'last_name', 'email')
-      .exec();
-
-    return prods.map((prod) => {
-      prod.id = prod._id.toString();
-      delete prod._id;
-
-      return prod;
-    });
   }
 
   async buyProduct(email: string, productId: string, amount: number) {

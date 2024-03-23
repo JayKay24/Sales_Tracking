@@ -2,6 +2,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
@@ -10,13 +11,13 @@ import { User, UserDocument, UserRole } from './user.schema';
 import * as bcrypt from 'bcrypt';
 import { saltOrRounds } from 'auth/auth.service';
 import { InjectModel } from '@nestjs/mongoose';
-import { ProductService } from 'product/product.service';
+import { Product } from 'product/product.schema';
 
 @Injectable()
 export class UserService {
   constructor(
+    @InjectModel('Product') private readonly productModel: Model<Product>,
     @InjectModel('User') private readonly userModel: Model<User>,
-    private productService: ProductService,
   ) {}
 
   async addUser(
@@ -142,18 +143,37 @@ export class UserService {
   }
 
   async assignProducts(email: string) {
-    const user = await this.userModel.findOne({ email }).exec();
+    const user = await this.findUserByEmail(email);
     if (user.role !== UserRole.AGENT) {
       throw new ForbiddenException(
         'Only agents can assign themselves to products to sell. 2 at a time.',
       );
     }
-    const prods = this.productService.assignProduct(email);
+    const res = await this.productModel
+      .updateMany({ agent: { $eq: null } }, { agent: user })
+      .limit(2)
+      .exec();
 
-    return prods;
+    if (!res.acknowledged) {
+      throw new InternalServerErrorException(
+        `Could not assign products to the agent of the email, ${email}`,
+      );
+    }
+
+    const prods = await this.productModel
+      .find({ agent: { $eq: user._id } })
+      .populate('agent', 'first_name', 'last_name', 'email')
+      .exec();
+
+    return prods.map((prod) => {
+      prod.id = prod._id.toString();
+      delete prod._id;
+
+      return prod;
+    });
   }
 
-  private async findUser(userId: string): Promise<UserDocument> {
+  async findUser(userId: string): Promise<UserDocument> {
     try {
       const user = await this.userModel.findById(userId).exec();
       if (!user) {

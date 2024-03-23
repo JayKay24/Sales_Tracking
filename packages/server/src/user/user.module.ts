@@ -5,14 +5,17 @@ import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ProductService } from 'product/product.service';
+import { ProductSchema } from 'product/product.schema';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: 'Product', schema: ProductSchema },
+      { name: 'User', schema: UserSchema },
+    ]),
   ],
   controllers: [UserController],
-  providers: [UserService, JwtService, ConfigService, ProductService],
+  providers: [UserService, JwtService, ConfigService],
 })
 export class UserModule {}
