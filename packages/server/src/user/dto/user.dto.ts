@@ -4,6 +4,7 @@ import {
   IsEmpty,
   IsIn,
   IsNotEmpty,
+  IsOptional,
   IsPhoneNumber,
   IsString,
   MaxLength,
@@ -60,4 +61,39 @@ export class AgentDtoCreate extends UserDtoCreate {
 export class UserDtoUpdate extends UserDtoCreate {
   @IsEmpty()
   role: UserRole;
+
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  @MaxLength(40)
+  first_name: string;
+
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  @MaxLength(40)
+  last_name: string;
+
+  @IsEmail()
+  @IsOptional()
+  @MinLength(10)
+  @MaxLength(30)
+  email: string;
+
+  @IsString()
+  @IsOptional()
+  @MinLength(5)
+  @MaxLength(40)
+  @IsAlphanumeric()
+  password: string;
+
+  @IsOptional()
+  @IsPhoneNumber('KE')
+  phone_number: string;
+
+  @IsOptional()
+  @IsString()
+  @MinLength(4)
+  @MaxLength(40)
+  county: string;
 }
