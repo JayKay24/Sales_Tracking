@@ -24,7 +24,7 @@ class User {
   password: string;
 
   @Prop({ required: true })
-  role: string;
+  role: UserRole;
 
   @Prop({ required: true })
   phone_number: string;
