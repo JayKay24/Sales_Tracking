@@ -1,19 +1,23 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product, ProductCategory } from './product.schema';
 import { User, UserRole } from 'user/user.schema';
+import { UserService } from 'user/user.service';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectModel('Product') private readonly productModel: Model<Product>,
     @InjectModel('User') private readonly userModel: Model<User>,
+    private userService: UserService,
   ) {}
 
   async addProduct(
@@ -22,7 +26,7 @@ export class ProductService {
     category: ProductCategory,
     price: number,
   ) {
-    const user = await this.userModel.findOne({ email }).exec();
+    const user = await this.userService.findUserByEmail(email);
     if (user.role !== UserRole.ADMIN) {
       throw new ForbiddenException(
         'Only admins can add products that agents will sell',
@@ -66,7 +70,7 @@ export class ProductService {
   }
 
   async assignProduct(email: string) {
-    const user = await this.userModel.findOne({ email }).exec();
+    const user = await this.userService.findUserByEmail(email);
     const res = await this.productModel
       .updateMany({ agent: { $eq: null } }, { agent: user })
       .limit(2)
@@ -89,5 +93,28 @@ export class ProductService {
 
       return prod;
     });
+  }
+
+  async buyProduct(email: string, productId: string, amount: number) {
+    const user = await this.userService.findUserByEmail(email);
+    if (user.role !== UserRole.CUSTOMER) {
+      throw new ForbiddenException('Only customers can buy products');
+    }
+
+    const product = await this.productModel.findById(productId).exec();
+
+    if (!product) {
+      throw new NotFoundException(`Product with id ${productId} not found`);
+    }
+
+    if (amount < product.price) {
+      throw new BadRequestException('Payment is too low');
+    }
+
+    await this.productModel.findByIdAndDelete(productId);
+
+    return {
+      change: amount - product.price,
+    };
   }
 }
