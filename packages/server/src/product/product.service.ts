@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Product, ProductCategory } from './product.schema';
+import { Product, ProductCategory, ProductDocument } from './product.schema';
 import { User, UserRole } from 'user/user.schema';
 import { UserService } from 'user/user.service';
 
@@ -111,10 +111,60 @@ export class ProductService {
       throw new BadRequestException('Payment is too low');
     }
 
+    // Before delete, raise sale event
+
     await this.productModel.findByIdAndDelete(productId);
 
     return {
       change: amount - product.price,
     };
+  }
+
+  async updateProduct(
+    email: string,
+    productId: string,
+    name = '',
+    category = '',
+    price = 0,
+  ) {
+    const user = await this.userService.findUserByEmail(email);
+    if (user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Only admins can upate product information');
+    }
+
+    const prod = await this.findProductById(productId);
+    if (name) {
+      prod.name = name;
+    }
+
+    if (category) {
+      prod.category = category as ProductCategory;
+    }
+
+    if (price) {
+      prod.price = price;
+    }
+
+    await prod.save();
+
+    return {
+      id: prod._id.toString(),
+      name: prod.name,
+      category: prod.category,
+      price: prod.price,
+    };
+  }
+
+  async findProductById(productId: string): Promise<ProductDocument> {
+    try {
+      const prod = await this.productModel.findById(productId).exec();
+      if (!prod) {
+        throw new NotFoundException();
+      }
+
+      return prod;
+    } catch (error) {
+      throw new NotFoundException(`product with id ${productId} not found`);
+    }
   }
 }
