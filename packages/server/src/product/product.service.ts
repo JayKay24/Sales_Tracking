@@ -155,6 +155,15 @@ export class ProductService {
     };
   }
 
+  async deleteProduct(email: string, productId: string) {
+    const user = await this.userService.findUserByEmail(email);
+    if (user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Only admins can delete a product');
+    }
+
+    await this.productModel.findByIdAndDelete(productId);
+  }
+
   async findProductById(productId: string): Promise<ProductDocument> {
     try {
       const prod = await this.productModel.findById(productId).exec();
