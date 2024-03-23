@@ -1,6 +1,7 @@
 import {
   IsIn,
   IsNotEmpty,
+  IsOptional,
   Max,
   MaxLength,
   Min,
@@ -25,6 +26,28 @@ export class ProductDtoCreate {
   category: ProductCategory;
 
   @IsNotEmpty()
+  @Min(5000)
+  @Max(50000)
+  price: number;
+}
+
+export class ProductDtoUpdate {
+  @IsOptional()
+  @MinLength(5)
+  @MaxLength(20)
+  name: string;
+
+  @IsOptional()
+  @IsIn([
+    ProductCategory.CONSTRUCTION,
+    ProductCategory.FOOD_BEVERAGES,
+    ProductCategory.MEDICAL,
+    ProductCategory.OFFICE_SUPPLIES,
+    ProductCategory.TECHNOLOGY,
+  ])
+  category: ProductCategory;
+
+  @IsOptional()
   @Min(5000)
   @Max(50000)
   price: number;
