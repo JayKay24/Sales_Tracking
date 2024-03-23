@@ -40,6 +40,20 @@ export class ProductController {
     return newProduct;
   }
 
+  @Post('buy/:id')
+  async buyProduct(
+    @Param('id') productId: string,
+    @Body() customerAmount: { amount: number },
+    @Headers('Authorization') token: string,
+  ) {
+    const payload = this.extractPayload(token);
+    return this.productService.buyProduct(
+      payload.email,
+      productId,
+      customerAmount.amount,
+    );
+  }
+
   @Patch(':id')
   async updateProduct(
     @Param('id') prodId: string,
