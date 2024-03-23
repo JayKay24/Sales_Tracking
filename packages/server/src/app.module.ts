@@ -6,7 +6,6 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ProductController } from './product/product.controller';
-import { ProductService } from './product/product.service';
 import { ProductModule } from './product/product.module';
 
 @Module({
@@ -24,6 +23,6 @@ import { ProductModule } from './product/product.module';
     ProductModule,
   ],
   controllers: [AppController, ProductController],
-  providers: [AppService, ProductService],
+  providers: [AppService],
 })
 export class AppModule {}
