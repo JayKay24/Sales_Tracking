@@ -1,12 +1,13 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product, ProductCategory } from './product.schema';
-import { User } from 'user/user.schema';
+import { User, UserRole } from 'user/user.schema';
 
 @Injectable()
 export class ProductService {
@@ -15,7 +16,18 @@ export class ProductService {
     @InjectModel('User') private readonly userModel: Model<User>,
   ) {}
 
-  async addProduct(name: string, category: ProductCategory, price: number) {
+  async addProduct(
+    email: string,
+    name: string,
+    category: ProductCategory,
+    price: number,
+  ) {
+    const user = await this.userModel.findOne({ email }).exec();
+    if (user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Only admins can add products that agents will sell',
+      );
+    }
     const existingProduct = await this.productModel.findOne({ name });
     if (existingProduct) {
       throw new ConflictException('Product with that name already exists');
