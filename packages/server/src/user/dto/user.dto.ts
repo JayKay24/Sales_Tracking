@@ -1,6 +1,7 @@
 import {
   IsAlphanumeric,
   IsEmail,
+  IsEmpty,
   IsIn,
   IsNotEmpty,
   IsPhoneNumber,
@@ -53,5 +54,10 @@ export class UserDtoCreate {
 export class AgentDtoCreate extends UserDtoCreate {
   @IsNotEmpty()
   @IsIn([UserRole.AGENT])
+  role: UserRole;
+}
+
+export class UserDtoUpdate extends UserDtoCreate {
+  @IsEmpty()
   role: UserRole;
 }

@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -78,6 +79,7 @@ export class UserService {
   }
 
   async updateUser(
+    jwtPayload,
     userId,
     firstName = '',
     lastName = '',
@@ -88,6 +90,9 @@ export class UserService {
   ) {
     try {
       const user = await this.findUser(userId);
+      if (user.email !== jwtPayload.email) {
+        throw new ForbiddenException();
+      }
 
       if (firstName) {
         user.first_name = firstName;
@@ -125,6 +130,9 @@ export class UserService {
         county: user.county,
       };
     } catch (error) {
+      if (error instanceof ForbiddenException) {
+        throw new ForbiddenException('You can only modify your own data');
+      }
       throw new NotFoundException(`user with id ${userId} not found`);
     }
   }

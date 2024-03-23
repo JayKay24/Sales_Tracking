@@ -1,7 +1,15 @@
-import { Body, Controller, Headers, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Headers,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from './user.service';
-import { AgentDtoCreate, UserDtoCreate } from './dto/user.dto';
+import { AgentDtoCreate, UserDtoCreate, UserDtoUpdate } from './dto/user.dto';
 import { ConfigService } from '@nestjs/config';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 
@@ -46,6 +54,28 @@ export class UserController {
     );
 
     return newAgent;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  async updateUser(
+    @Param('id') userId: string,
+    @Body() attributes: UserDtoUpdate,
+    @Headers('Authorization') token: string,
+  ) {
+    const payload = this.extractPayload(token);
+    const updateUser = await this.userService.updateUser(
+      payload,
+      userId,
+      attributes.first_name,
+      attributes.last_name,
+      attributes.email,
+      attributes.password,
+      attributes.phone_number,
+      attributes.county,
+    );
+
+    return updateUser;
   }
 
   private extractPayload(token: string) {
