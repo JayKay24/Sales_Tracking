@@ -12,8 +12,14 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ProductService } from './product.service';
 import { JwtAuthGuard } from 'auth/jwt.guard';
-import { ProductDtoCreate, ProductDtoUpdate } from './dto/product.dto';
+import {
+  ProductDtoCreate,
+  ProductDtoResponse,
+  ProductDtoUpdate,
+} from './dto/product.dto';
 import { ConfigService } from '@nestjs/config';
+import { ApiHeader, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { bearerDesc, exampleToken } from 'user/user.controller';
 
 @Controller('api/v1/products')
 export class ProductController {
@@ -23,6 +29,28 @@ export class ProductController {
     private configService: ConfigService,
   ) {}
 
+  @ApiResponse({
+    description: 'Product with that name already exists',
+    status: 409,
+  })
+  @ApiResponse({
+    description: 'Only admins can add products that agents will sell',
+    status: 403,
+  })
+  @ApiResponse({
+    description: 'added product',
+    type: ProductDtoResponse,
+    status: 201,
+  })
+  @ApiOperation({
+    description: 'admin can add a product',
+  })
+  @ApiHeader({
+    name: 'Authorization',
+    description: bearerDesc,
+    example: exampleToken,
+    required: true,
+  })
   @UseGuards(JwtAuthGuard)
   @Post()
   async addProduct(
@@ -40,6 +68,27 @@ export class ProductController {
     return newProduct;
   }
 
+  @ApiResponse({
+    description: 'Product with id {productId} not found',
+    status: 404,
+  })
+  @ApiResponse({
+    description: 'Only customers can buy products',
+    status: 403,
+  })
+  @ApiResponse({
+    description: 'cash change from purchase',
+    status: 200,
+  })
+  @ApiOperation({
+    description: 'customer can buy a product',
+  })
+  @ApiHeader({
+    name: 'Authorization',
+    description: bearerDesc,
+    example: exampleToken,
+    required: true,
+  })
   @Post('buy/:id')
   async buyProduct(
     @Param('id') productId: string,
@@ -54,6 +103,24 @@ export class ProductController {
     );
   }
 
+  @ApiResponse({
+    description: 'Only admins can upate product information',
+    status: 403,
+  })
+  @ApiResponse({
+    description: 'updated product',
+    type: ProductDtoResponse,
+    status: 200,
+  })
+  @ApiOperation({
+    description: 'Update a products attributes',
+  })
+  @ApiHeader({
+    name: 'Authorization',
+    description: bearerDesc,
+    example: exampleToken,
+    required: true,
+  })
   @Patch(':id')
   async updateProduct(
     @Param('id') prodId: string,
@@ -72,12 +139,35 @@ export class ProductController {
     return prod;
   }
 
+  @ApiResponse({
+    description: 'products with agents assigned',
+    type: [ProductDtoResponse],
+    status: 200,
+  })
   @Get()
   async getProducts() {
     const prods = await this.productService.getProducts();
     return prods;
   }
 
+  @ApiResponse({
+    description: 'user with email {email} not found',
+    status: 404,
+  })
+  @ApiResponse({
+    description: 'products assigned to currently signed in agent',
+    type: [ProductDtoResponse],
+    status: 200,
+  })
+  @ApiOperation({
+    description: 'retrieve products assigned to currently signed in agent',
+  })
+  @ApiHeader({
+    name: 'Authorization',
+    description: bearerDesc,
+    example: exampleToken,
+    required: true,
+  })
   @UseGuards(JwtAuthGuard)
   @Get('agent')
   async getProductsByAgent(@Headers('Authorization') token: string) {
@@ -87,6 +177,23 @@ export class ProductController {
     return prods;
   }
 
+  @ApiResponse({
+    description: 'user with email {email} not found',
+    status: 404,
+  })
+  @ApiResponse({
+    description: 'product deleted',
+    status: 204,
+  })
+  @ApiOperation({
+    description: 'admin deletes a product',
+  })
+  @ApiHeader({
+    name: 'description',
+    description: bearerDesc,
+    example: exampleToken,
+    required: true,
+  })
   @Delete(':id')
   async deleteProduct(
     @Param('id') prodId: string,

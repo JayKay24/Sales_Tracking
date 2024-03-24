@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsIn,
   IsNotEmpty,
@@ -10,11 +11,23 @@ import {
 import { ProductCategory } from 'product/product.schema';
 
 export class ProductDtoCreate {
+  @ApiProperty({
+    description: 'name',
+    example: 'computer',
+    type: 'string',
+    minLength: 5,
+    maxLength: 20,
+  })
   @IsNotEmpty()
   @MinLength(5)
   @MaxLength(20)
   name: string;
 
+  @ApiProperty({
+    name: 'category',
+    type: 'string',
+    example: ProductCategory.TECHNOLOGY,
+  })
   @IsNotEmpty()
   @IsIn([
     ProductCategory.CONSTRUCTION,
@@ -25,6 +38,12 @@ export class ProductDtoCreate {
   ])
   category: ProductCategory;
 
+  @ApiProperty({
+    description: 'price',
+    example: 5000,
+    minimum: 5000,
+    maximum: 50000,
+  })
   @IsNotEmpty()
   @Min(5000)
   @Max(50000)
@@ -32,11 +51,23 @@ export class ProductDtoCreate {
 }
 
 export class ProductDtoUpdate {
+  @ApiProperty({
+    description: 'name',
+    example: 'computer',
+    type: 'string',
+    minLength: 5,
+    maxLength: 20,
+  })
   @IsOptional()
   @MinLength(5)
   @MaxLength(20)
   name: string;
 
+  @ApiProperty({
+    name: 'category',
+    type: 'string',
+    example: ProductCategory.TECHNOLOGY,
+  })
   @IsOptional()
   @IsIn([
     ProductCategory.CONSTRUCTION,
@@ -47,10 +78,19 @@ export class ProductDtoUpdate {
   ])
   category: ProductCategory;
 
+  @ApiProperty({
+    description: 'price',
+    example: 5000,
+    minimum: 5000,
+    maximum: 50000,
+  })
   @IsOptional()
   @Min(5000)
   @Max(50000)
   price: number;
 }
 
-export class ProductDtoResponse extends ProductDtoCreate {}
+export class ProductDtoResponse extends ProductDtoUpdate {
+  @ApiProperty()
+  id: string;
+}
