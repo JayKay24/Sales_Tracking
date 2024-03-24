@@ -50,12 +50,12 @@ export class CommissionService {
     const commissions = await this.commissionModel
       .find({
         agent_id: agentId,
-        startDate: { $gte: startDate.getTime(), $lte: endDate.getTime() },
+        createdAt: { $gte: startDate.getTime(), $lte: endDate.getTime() },
       })
       .exec();
 
     return commissions.reduce((accum, val) => accum + val.latestCommision, 0);
-  } 
+  }
 
   private calculateCommission(amount: number, rate: number) {
     return (rate / 100) * amount;
