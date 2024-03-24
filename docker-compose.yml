@@ -1,6 +1,11 @@
 version: "3.9"
 
 services:
+  broker:
+    image: rabbitmq:latest
+    ports:
+      - "5672:5672"
+    restart: always
   sales_database:
     image: mongo:latest
     ports:
