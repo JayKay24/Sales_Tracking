@@ -3,6 +3,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigService, ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { SalesModule } from './sales/sales.module';
+import { QueuesModule } from './queues/queues.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -14,6 +17,9 @@ import { AppService } from './app.service';
       }),
       inject: [ConfigService],
     }),
+    SalesModule,
+    QueuesModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
