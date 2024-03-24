@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsAlphanumeric,
   IsEmail,
@@ -13,24 +14,51 @@ import {
 import { UserRole } from 'user/user.schema';
 
 export class UserDtoCreate {
+  @ApiProperty({
+    name: 'first_name',
+    example: 'bruce',
+    type: 'string',
+    minLength: 2,
+    maxLength: 40,
+  })
   @IsNotEmpty()
   @IsString()
   @MinLength(2)
   @MaxLength(40)
   first_name: string;
 
+  @ApiProperty({
+    name: 'last_name',
+    example: 'wayne',
+    type: 'string',
+    minLength: 2,
+    maxLength: 40,
+  })
   @IsNotEmpty()
   @IsString()
   @MinLength(2)
   @MaxLength(40)
   last_name: string;
 
+  @ApiProperty({
+    name: 'email',
+    example: 'bruce@example.com',
+    type: 'string',
+    minLength: 10,
+    maxLength: 30,
+  })
   @IsEmail()
   @IsNotEmpty()
   @MinLength(10)
   @MaxLength(30)
   email: string;
 
+  @ApiProperty({
+    name: 'password',
+    example: '123pass',
+    minLength: 5,
+    maxLength: 40,
+  })
   @IsString()
   @IsNotEmpty()
   @MinLength(5)
@@ -38,14 +66,26 @@ export class UserDtoCreate {
   @IsAlphanumeric()
   password: string;
 
+  @ApiProperty({
+    name: 'role',
+    example: UserRole.CUSTOMER,
+  })
   @IsNotEmpty()
   @IsIn([UserRole.CUSTOMER])
   role: UserRole;
 
+  @ApiProperty({
+    name: 'phone_number',
+    example: '+254700000000',
+  })
   @IsNotEmpty()
   @IsPhoneNumber('KE')
   phone_number: string;
 
+  @ApiProperty({
+    name: 'county',
+    example: 'Nairobi',
+  })
   @IsString()
   @MinLength(4)
   @MaxLength(40)
@@ -53,33 +93,39 @@ export class UserDtoCreate {
 }
 
 export class AgentDtoCreate extends UserDtoCreate {
+  @ApiProperty()
   @IsNotEmpty()
   @IsIn([UserRole.AGENT])
   role: UserRole;
 }
 
 export class UserDtoUpdate extends UserDtoCreate {
+  @ApiProperty()
   @IsEmpty()
   role: UserRole;
 
+  @ApiProperty()
   @IsOptional()
   @IsString()
   @MinLength(2)
   @MaxLength(40)
   first_name: string;
 
+  @ApiProperty()
   @IsOptional()
   @IsString()
   @MinLength(2)
   @MaxLength(40)
   last_name: string;
 
+  @ApiProperty()
   @IsEmail()
   @IsOptional()
   @MinLength(10)
   @MaxLength(30)
   email: string;
 
+  @ApiProperty()
   @IsString()
   @IsOptional()
   @MinLength(5)
@@ -87,10 +133,12 @@ export class UserDtoUpdate extends UserDtoCreate {
   @IsAlphanumeric()
   password: string;
 
+  @ApiProperty()
   @IsOptional()
   @IsPhoneNumber('KE')
   phone_number: string;
 
+  @ApiProperty()
   @IsOptional()
   @IsString()
   @MinLength(4)
