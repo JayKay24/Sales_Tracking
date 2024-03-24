@@ -14,13 +14,23 @@ export class SalesService {
       price: content.price,
       product: content.product,
       agent: content.agent,
-      agentId: content.agentId,
-      customerId: content.customerId,
+      agent_id: content.agentId,
+      customer_id: content.customerId,
       customer: content.customer,
-      agentEmail: content.agentEmail,
-      customerEmail: content.customerEmail,
+      agent_email: content.agentEmail,
+      customer_email: content.customerEmail,
       commissionRate,
     });
     await newSale.save();
+  }
+
+  async getTotalSales(agentId: string, startDate: Date, endDate: Date) {
+    const sales = await this.saleModel
+      .find({
+        agent_id: agentId,
+        createdAt: { $gte: startDate.getTime(), $lte: endDate.getTime() },
+      })
+      .exec();
+    return [sales, sales.reduce((accum, val) => accum + val.price, 0)];
   }
 }

@@ -15,22 +15,22 @@ class Sale {
   agent: string;
 
   @Prop({ required: true })
-  agentId: string;
+  agent_id: string;
 
   @Prop({ required: true })
-  customerId: string;
+  customer_id: string;
 
   @Prop({ required: true })
   customer: string;
 
   @Prop({ required: true })
-  agentEmail: string;
+  agent_email: string;
 
   @Prop({ required: true })
-  customerEmail: string;
+  customer_email: string;
 
   @Prop({ required: true })
-  commissionRate: string;
+  commission_rate: string;
 }
 
 const SaleSchema = SchemaFactory.createForClass(Sale);
