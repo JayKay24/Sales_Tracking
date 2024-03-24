@@ -100,32 +100,54 @@ export class AgentDtoCreate extends UserDtoCreate {
 }
 
 export class UserDtoUpdate extends UserDtoCreate {
-  @ApiProperty()
+  @ApiProperty({
+    name: 'role',
+  })
   @IsEmpty()
   role: UserRole;
 
-  @ApiProperty()
+  @ApiProperty({
+    name: 'first_name',
+    example: 'bruce',
+    maxLength: 40,
+    minLength: 2,
+  })
   @IsOptional()
   @IsString()
   @MinLength(2)
   @MaxLength(40)
   first_name: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    name: 'last_name',
+    example: 'wayne',
+    minLength: 2,
+    maxLength: 40,
+  })
   @IsOptional()
   @IsString()
   @MinLength(2)
   @MaxLength(40)
   last_name: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    name: 'email',
+    example: 'bruce@example.com',
+    minLength: 10,
+    maxLength: 30,
+  })
   @IsEmail()
   @IsOptional()
   @MinLength(10)
   @MaxLength(30)
   email: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    name: 'password',
+    example: 'bruce123',
+    maxLength: 40,
+    minLength: 5,
+  })
   @IsString()
   @IsOptional()
   @MinLength(5)
@@ -133,12 +155,20 @@ export class UserDtoUpdate extends UserDtoCreate {
   @IsAlphanumeric()
   password: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    name: 'phone_number',
+    example: '+254700000000',
+  })
   @IsOptional()
   @IsPhoneNumber('KE')
   phone_number: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    name: 'county',
+    example: 'Nairobi',
+    minLength: 4,
+    maxLength: 40,
+  })
   @IsOptional()
   @IsString()
   @MinLength(4)
