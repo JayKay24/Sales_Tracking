@@ -28,6 +28,9 @@ class Sale {
 
   @Prop({ required: true })
   customerEmail: string;
+
+  @Prop({ required: true })
+  commissionRate: string;
 }
 
 const SaleSchema = SchemaFactory.createForClass(Sale);

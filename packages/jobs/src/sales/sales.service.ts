@@ -3,6 +3,7 @@ import { Model } from 'mongoose';
 import { Sale } from './sales.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { SaleEvent } from 'queues/queues.service';
+import { commissionRate } from 'commission/commission.service';
 
 @Injectable()
 export class SalesService {
@@ -18,6 +19,7 @@ export class SalesService {
       customer: content.customer,
       agentEmail: content.agentEmail,
       customerEmail: content.customerEmail,
+      commissionRate,
     });
     await newSale.save();
   }

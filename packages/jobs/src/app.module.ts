@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { SalesModule } from './sales/sales.module';
 import { QueuesModule } from './queues/queues.module';
 import { EmailModule } from './email/email.module';
+import { CommissionModule } from './commission/commission.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { EmailModule } from './email/email.module';
     SalesModule,
     QueuesModule,
     EmailModule,
+    CommissionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
