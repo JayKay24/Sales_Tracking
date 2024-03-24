@@ -10,12 +10,14 @@ import { Model } from 'mongoose';
 import { Product, ProductCategory, ProductDocument } from './product.schema';
 import { UserRole } from 'user/user.schema';
 import { UserService } from 'user/user.service';
+import { ProducerQueuesService, SaleEvent } from 'queues/queues.service';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectModel('Product') private readonly productModel: Model<Product>,
     private userService: UserService,
+    private producerQueuesService: ProducerQueuesService,
   ) {}
 
   async addProduct(
@@ -101,6 +103,29 @@ export class ProductService {
     }
 
     // Before delete, raise sale event
+    const sale: SaleEvent = {
+      price: 0,
+      product: '',
+      agent: '',
+      agentId: '',
+      customerId: '',
+      customer: '',
+      agentEmail: '',
+      customerEmail: '',
+    };
+
+    const agent = await this.userService.findUserByEmail(product.agent.email);
+
+    sale.price = product.price;
+    sale.product = product.name;
+    sale.agent = `${agent.first_name} ${agent.last_name}`;
+    sale.agentId = agent._id.toString();
+    sale.customerId = user._id.toString();
+    sale.customer = `${user.first_name} ${user.last_name}`;
+    sale.agentEmail = agent.email;
+    sale.customerEmail = user.email;
+
+    await this.producerQueuesService.addToSalesQueue(sale);
 
     await this.productModel.findByIdAndDelete(productId);
 
