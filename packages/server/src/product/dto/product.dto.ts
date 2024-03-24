@@ -52,3 +52,5 @@ export class ProductDtoUpdate {
   @Max(50000)
   price: number;
 }
+
+export class ProductDtoResponse extends ProductDtoCreate {}

@@ -175,3 +175,8 @@ export class UserDtoUpdate extends UserDtoCreate {
   @MaxLength(40)
   county: string;
 }
+
+export class UserResponse extends UserDtoCreate {
+  @ApiProperty()
+  id: string;
+}

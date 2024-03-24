@@ -10,10 +10,22 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from './user.service';
-import { AgentDtoCreate, UserDtoCreate, UserDtoUpdate } from './dto/user.dto';
+import {
+  AgentDtoCreate,
+  UserDtoCreate,
+  UserDtoUpdate,
+  UserResponse,
+} from './dto/user.dto';
 import { ConfigService } from '@nestjs/config';
 import { JwtAuthGuard } from '../auth/jwt.guard';
+import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ProductDtoResponse } from 'product/dto/product.dto';
 
+export const exampleToken =
+  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im9saXZlckB0ZXN0LmNvbSIsInN1YiI6IjY0NTI0NzMxMGRlNTFiNTEwYmVlMzFjZSIsImlhdCI6MTY4MzExMzg0OCwiZXhwIjoxNjgzMjAwMjQ4fQ.T1ztqXzIARMxBIcTdGfXktT7mKCPx5CjuweNnMm4puE';
+export const bearerDesc = 'Bearer token signed with jwt';
+
+@ApiTags('users')
 @Controller('api/v1/users')
 export class UserController {
   constructor(
@@ -22,6 +34,18 @@ export class UserController {
     private configService: ConfigService,
   ) {}
 
+  @ApiResponse({
+    description: 'The newly added user',
+    type: UserResponse,
+    status: 201,
+  })
+  @ApiResponse({
+    description: 'User with that email already exists',
+    status: 409,
+  })
+  @ApiOperation({
+    description: 'Register a new user',
+  })
   @Post()
   async addUser(@Body() user: UserDtoCreate) {
     const newUser = await this.userService.addUser(
@@ -36,6 +60,24 @@ export class UserController {
     return newUser;
   }
 
+  @ApiResponse({
+    description: 'Only admins allowed to add agents',
+    status: 404,
+  })
+  @ApiResponse({
+    description: 'Agent registered',
+    type: UserResponse,
+    status: 201,
+  })
+  @ApiOperation({
+    description: 'Admin registers an agent',
+  })
+  @ApiHeader({
+    name: 'Authorization',
+    description: bearerDesc,
+    example: exampleToken,
+    required: true,
+  })
   @UseGuards(JwtAuthGuard)
   @Post('admins')
   async addAgent(
@@ -57,6 +99,25 @@ export class UserController {
     return newAgent;
   }
 
+  @ApiResponse({
+    description:
+      'Only agents can assign themselves to products to sell. 2 at a time.',
+    status: 403,
+  })
+  @ApiResponse({
+    description: 'all products assigned to currently signed in agent',
+    type: [ProductDtoResponse],
+    status: 200,
+  })
+  @ApiOperation({
+    description: 'Assign products to currently signed in agent',
+  })
+  @ApiHeader({
+    name: 'Authorization',
+    description: bearerDesc,
+    example: exampleToken,
+    required: true,
+  })
   @UseGuards(JwtAuthGuard)
   @Get('agents')
   async assignProducts(@Headers('Authorization') token: string) {
@@ -66,6 +127,28 @@ export class UserController {
     return products;
   }
 
+  @ApiResponse({
+    description: `user with id '{userId} not found`,
+    status: 404,
+  })
+  @ApiResponse({
+    description: 'You can only modify your own data',
+    status: 403,
+  })
+  @ApiResponse({
+    description: 'Updated user',
+    type: UserResponse,
+    status: 200,
+  })
+  @ApiOperation({
+    description: 'Update attributes of user matching id query param',
+  })
+  @ApiHeader({
+    name: 'Authorization',
+    description: bearerDesc,
+    example: exampleToken,
+    required: true,
+  })
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async updateUser(
