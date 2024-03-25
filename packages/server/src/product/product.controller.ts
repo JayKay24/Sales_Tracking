@@ -97,11 +97,13 @@ export class ProductController {
     @Headers('Authorization') token: string,
   ) {
     const payload = this.extractPayload(token);
-    return this.productService.buyProduct(
+    const change = await this.productService.buyProduct(
       payload.email,
       productId,
       customerAmount.amount,
     );
+
+    return change;
   }
 
   @ApiResponse({
