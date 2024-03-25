@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from './user.service';
 import {
   AgentDtoCreate,
+  EmailNotificationDto,
   UserDtoCreate,
   UserDtoUpdate,
   UserResponse,
@@ -169,6 +170,41 @@ export class UserController {
     );
 
     return updateUser;
+  }
+
+  @ApiResponse({
+    description: 'user with email {email} not found',
+    status: 404,
+  })
+  @ApiResponse({
+    description: 'all agents will be notified with given message',
+    status: 204,
+  })
+  @ApiOperation({
+    description:
+      'admins can notify agents of summaries of sales between given dates',
+  })
+  @ApiHeader({
+    name: 'Authorization',
+    description: bearerDesc,
+    example: exampleToken,
+    required: true,
+  })
+  @UseGuards(JwtAuthGuard)
+  @Post('admins/notify')
+  async notifyAgents(
+    @Headers() token: string,
+    @Body() notification: EmailNotificationDto,
+  ) {
+    const payload = this.extractPayload(token);
+    await this.userService.notifyAgents(
+      payload.email,
+      notification.message,
+      new Date(notification.startDate),
+      new Date(notification.endDate),
+    );
+
+    return null;
   }
 
   private extractPayload(token: string) {

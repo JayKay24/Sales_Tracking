@@ -12,12 +12,14 @@ import * as bcrypt from 'bcrypt';
 import { saltOrRounds } from 'auth/auth.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product } from 'product/product.schema';
+import { ProducerQueuesService } from 'queues/queues.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel('Product') private readonly productModel: Model<Product>,
     @InjectModel('User') private readonly userModel: Model<User>,
+    private producerQueueService: ProducerQueuesService,
   ) {}
 
   async addUser(
@@ -171,6 +173,28 @@ export class UserService {
 
       return prod;
     });
+  }
+
+  async notifyAgents(
+    email: string,
+    message: string,
+    startDate: Date,
+    endDate: Date,
+  ) {
+    const user = await this.findUser(email);
+    if (user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException(
+        'Only admins can notify agents of sales records and commissions earned',
+      );
+    }
+
+    const agents = await this.userModel.find({}).exec();
+    const ids: string[] = [];
+    agents.forEach((agent) => {
+      ids.push(agent._id.toString());
+    });
+
+    this.producerQueueService.notifyAgents(ids, message, startDate, endDate);
   }
 
   async findUser(userId: string): Promise<UserDocument> {

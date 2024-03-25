@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsAlphanumeric,
+  IsDateString,
   IsEmail,
   IsEmpty,
   IsIn,
@@ -179,4 +180,30 @@ export class UserDtoUpdate extends UserDtoCreate {
 export class UserResponse extends UserDtoCreate {
   @ApiProperty()
   id: string;
+}
+
+export class EmailNotificationDto {
+  @ApiProperty({
+    name: 'message',
+    example: "Here's your summary of sales from {startDate} to {endDate}",
+  })
+  @IsString()
+  @IsNotEmpty()
+  message: string;
+
+  @ApiProperty({
+    name: 'startDate',
+    example: 'YYYY-MM-DD',
+  })
+  @IsNotEmpty()
+  @IsDateString()
+  startDate: string;
+
+  @ApiProperty({
+    name: 'endDate',
+    example: 'YYYY-MM-DD',
+  })
+  @IsNotEmpty()
+  @IsDateString()
+  endDate: string;
 }
