@@ -3,6 +3,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -14,6 +15,8 @@ import { ProducerQueuesService, SaleEvent } from 'queues/queues.service';
 
 @Injectable()
 export class ProductService {
+  private readonly logger = new Logger(ProductService.name);
+
   constructor(
     @InjectModel('Product') private readonly productModel: Model<Product>,
     private userService: UserService,
@@ -28,12 +31,14 @@ export class ProductService {
   ) {
     const user = await this.userService.findUserByEmail(email);
     if (user.role !== UserRole.ADMIN) {
+      this.logger.error('Failed to add a product');
       throw new ForbiddenException(
         'Only admins can add products that agents will sell',
       );
     }
     const existingProduct = await this.productModel.findOne({ name });
     if (existingProduct) {
+      this.logger.error('Failed to add a product');
       throw new ConflictException('Product with that name already exists');
     }
 
@@ -72,6 +77,9 @@ export class ProductService {
   async getproductsByAgent(email: string) {
     const user = await this.userService.findUserByEmail(email);
     if (user.role !== UserRole.AGENT) {
+      this.logger.error(
+        'Failed to fetch products by currently signed in agent',
+      );
       throw new ForbiddenException('Only agents can view their products');
     }
     const prods = await this.productModel
@@ -89,16 +97,19 @@ export class ProductService {
   async buyProduct(email: string, productId: string, amount: number) {
     const user = await this.userService.findUserByEmail(email);
     if (user.role !== UserRole.CUSTOMER) {
+      this.logger.error(`Failed to buy product with user role ${user.role}`);
       throw new ForbiddenException('Only customers can buy products');
     }
 
     const product = await this.productModel.findById(productId).exec();
 
     if (!product) {
+      this.logger.error(`Failed to buy product with id ${productId}`);
       throw new NotFoundException(`Product with id ${productId} not found`);
     }
 
     if (amount < product.price) {
+      this.logger.error(`Failed to buy product with amount ${amount}`);
       throw new BadRequestException('Payment is too low');
     }
 
@@ -143,6 +154,9 @@ export class ProductService {
   ) {
     const user = await this.userService.findUserByEmail(email);
     if (user.role !== UserRole.ADMIN) {
+      this.logger.error(
+        `Failed to buy update product with user role ${user.role}`,
+      );
       throw new ForbiddenException('Only admins can upate product information');
     }
 
@@ -172,6 +186,7 @@ export class ProductService {
   async deleteProduct(email: string, productId: string) {
     const user = await this.userService.findUserByEmail(email);
     if (user.role !== UserRole.ADMIN) {
+      this.logger.error(`Failed to delete product with user role ${user.role}`);
       throw new ForbiddenException('Only admins can delete a product');
     }
 
