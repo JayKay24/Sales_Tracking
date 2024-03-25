@@ -18,9 +18,10 @@ import {
   ProductDtoUpdate,
 } from './dto/product.dto';
 import { ConfigService } from '@nestjs/config';
-import { ApiHeader, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { bearerDesc, exampleToken } from 'user/user.controller';
 
+@ApiTags('products')
 @Controller('api/v1/products')
 export class ProductController {
   constructor(

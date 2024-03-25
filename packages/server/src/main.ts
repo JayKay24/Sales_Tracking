@@ -19,12 +19,12 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('auth')
     .addTag('users')
-    .addTag('user')
+    .addTag('products')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
 
-  SwaggerModule.setup('/api/v1/docs', app, document);
+  SwaggerModule.setup('api/v1/docs', app, document);
   app.enableCors();
 
   await app.listen(4000);
