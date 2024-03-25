@@ -5,8 +5,8 @@ import * as Mailchimp from '@mailchimp/mailchimp_transactional';
 export interface EmailEvent {
   agentIds: string;
   message: string;
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
 }
 
 @Injectable()

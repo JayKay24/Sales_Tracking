@@ -25,14 +25,14 @@ export class CommissionService {
     await commision.save();
   }
 
-  async getUnPaidCommissions(agentId: string) {
+  async getUnPaidCommissions(agentId: string, howManyDaysAgo: Date) {
     const today = new Date();
-    const fifteenDaysAgo = new Date(today.getTime() - 15 * 24 * 60 * 60);
+    // const fifteenDaysAgo = new Date(today.getTime() - 15 * 24 * 60 * 60);
 
     const unpaidCommissions = await this.commissionModel
       .find({
         agent_id: agentId,
-        createdAt: { $lte: fifteenDaysAgo },
+        createdAt: { $lte: howManyDaysAgo },
       })
       .exec();
 
