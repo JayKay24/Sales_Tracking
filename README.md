@@ -13,10 +13,9 @@ Make sure docker is up and running. Go to your command line and execute the foll
 1. Create an `.env` with the following keys:
   ```
   JOBS_CONN_STR_LOCAL="mongodb://sales_database:27017/inc_olap"
-  DB_PASSWORD="some_password"
-  DB_USER="some_username"
+  DB_PASSWORD="<ANY PASSWORD WILL DO>"
   CONN_STR_LOCAL="mongodb://server_oltp_database:27017/inc_oltp"
-  JWT_SECRET="some_secret"
+  JWT_SECRET="<YOUR JWT SECRET>"
   NODE_ENV="development"
   JWT_EXPIRY="1d"
   BROKER_URL="amqp://rabbitmq_broker:5672"
@@ -50,3 +49,7 @@ The application uses a microservices arechitecture and splits the workload into 
 
 ## Testing
 To run the tests locally, navigate to the root directoy and run `npx lerna run test`.
+
+## Items remaining
+1. Hosting
+2. Increasing test coverage
