@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { Sale } from './sales.schema';
+import { Sale, SaleDocument } from './sales.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { SaleEvent } from 'queues/queues.service';
 import { CommissionService, commissionRate } from 'commission/commission.service';
+import { EmailEvent, EmailService } from 'email/email.service';
 
 @Injectable()
 export class SalesService {
   constructor(@InjectModel('Sale') private readonly saleModel: Model<Sale>, 
-  private commissionService: CommissionService) {}
+  private commissionService: CommissionService, private emailService: EmailService) {}
 
   async recordSale(content: SaleEvent) {
     const newSale = new this.saleModel({
@@ -26,13 +27,24 @@ export class SalesService {
     await this.commissionService.recordCommission(newSale.agent_id, newSale.price);
   }
 
-  async getTotalSales(agentId: string, startDate: Date, endDate: Date) {
-    const sales = await this.saleModel
+  async getTotalSales(agentId: string, startDate: Date, endDate: Date): Promise<[SaleDocument[], number]> {
+    const sales: SaleDocument[] = await this.saleModel
       .find({
         agent_id: agentId,
         createdAt: { $gte: startDate.getTime(), $lte: endDate.getTime() },
       })
       .exec();
     return [sales, sales.reduce((accum, val) => accum + val.price, 0)];
+  }
+
+  async prepareNotifications(content: EmailEvent) {
+    const agentIds = content.agentIds.split('\n');
+    agentIds.forEach(async (agentId) => {
+      const [sales, totalSales] = await this.getTotalSales(agentId, new Date(content.startDate), new Date(content.endDate));
+      const email = sales[0].agent_email;
+      const totalCommission = await this.commissionService.getTotalCommissionsBetweenDates(agentId, new Date(content.startDate), new Date(content.endDate));
+
+      await this.emailService.sendEmail(email, `Sales between ${content.startDate} and ${content.endDate}`, content.message + `\nTotal Sales: ${totalSales}\nTotal Commission: ${totalCommission}`);
+    });
   }
 }
