@@ -3,6 +3,7 @@ import {
   IsIn,
   IsNotEmpty,
   IsOptional,
+  IsString,
   Max,
   MaxLength,
   Min,
@@ -12,7 +13,7 @@ import { ProductCategory } from 'product/product.schema';
 
 export class ProductDtoCreate {
   @ApiProperty({
-    description: 'name',
+    name: 'name',
     example: 'computer',
     type: 'string',
     minLength: 5,
@@ -39,7 +40,7 @@ export class ProductDtoCreate {
   category: ProductCategory;
 
   @ApiProperty({
-    description: 'price',
+    name: 'price',
     example: 5000,
     minimum: 5000,
     maximum: 50000,
@@ -52,7 +53,7 @@ export class ProductDtoCreate {
 
 export class ProductDtoUpdate {
   @ApiProperty({
-    description: 'name',
+    name: 'name',
     example: 'computer',
     type: 'string',
     minLength: 5,
@@ -79,7 +80,7 @@ export class ProductDtoUpdate {
   category: ProductCategory;
 
   @ApiProperty({
-    description: 'price',
+    name: 'price',
     example: 5000,
     minimum: 5000,
     maximum: 50000,
@@ -92,5 +93,23 @@ export class ProductDtoUpdate {
 
 export class ProductDtoResponse extends ProductDtoUpdate {
   @ApiProperty()
+  id: string;
+}
+
+export class ProductDtoBuy {
+  @ApiProperty({
+    name: 'amount',
+    minimum: 5000,
+    maximum: 50000,
+    type: 'number',
+  })
+  @IsNotEmpty()
+  @Min(5000)
+  @Max(50000)
+  amount: number;
+
+  @ApiProperty({ description: 'productId', type: 'string' })
+  @IsNotEmpty()
+  @IsString()
   id: string;
 }
