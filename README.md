@@ -36,9 +36,9 @@ Alternatively, with the application running, visit `http://localhost:4000/api/v1
 
 The application uses a microservices arechitecture and splits the workload into two categories:
 
-1. OLTP - These are the day to day transactional requests that the users will make to the application e.g registration, buying a product etc.
-2. OLAP - These are the background jobs required to fulfill application requirments that will require long-running calculations e.g calculating agent
-  commissions and unpaid commissions within a given date range, sending emails to agents etc.
+1. OLTP(Server/API) - These are the day to day transactional requests that the users will make to the application e.g registration, buying a product etc.
+2. OLAP(Jobs) - These are the background jobs required to fulfill application requirments that will require long-running calculations e.g calculating agent
+  commissions and unpaid commissions within a given date range, sending emails to agents etc. Will also run cron jobs at specific intervals to send emails.
 
 Also, this repository is structured as a [monorepo](https://lerna.js.org/) to run tests in parallel and to keep all services under one repository.
 
