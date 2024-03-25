@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import amqp, { ChannelWrapper } from 'amqp-connection-manager';
 import { SalesService } from 'sales/sales.service';
@@ -17,6 +17,7 @@ export interface SaleEvent {
 
 @Injectable()
 export class ConsumerQueuesService implements OnModuleInit {
+  private logger = new Logger(ConsumerQueuesService.name);
   private channelWrapper: ChannelWrapper;
   constructor(
     private salesService: SalesService,
@@ -35,14 +36,14 @@ export class ConsumerQueuesService implements OnModuleInit {
         await channel.consume('salesQueue', async (message) => {
           if (message) {
             const content = JSON.parse(message.content.toString()) as SaleEvent;
+            this.logger.log('message received', content);
             await this.salesService.recordSale(content);
             channel.ack(message);
           }
         });
       });
     } catch (error) {
-      console.log('Error starting the consumer');
-      process.exit(1);
+      this.logger.log('Could not record sale');
     }
   }
 }
