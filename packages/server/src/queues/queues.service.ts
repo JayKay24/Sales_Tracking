@@ -47,6 +47,7 @@ export class ProducerQueuesService {
         'salesQueue',
         Buffer.from(JSON.stringify(sale)),
       );
+      this.logger.log(`${sale} message sent to broker`);
     } catch (error) {
       this.logger.error(`Could not send sale ${sale} to broker`);
       throw new InternalServerErrorException('Could not record sale');
@@ -71,6 +72,7 @@ export class ProducerQueuesService {
         'emailsQueue',
         Buffer.from(JSON.stringify(emailEvent)),
       );
+      this.logger.log(`${emailEvent} delivered to broker`);
     } catch (error) {
       this.logger.error(`Could not send notification ${emailEvent} to broker`);
       throw new InternalServerErrorException('Could not notify recipients');
