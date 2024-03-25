@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import amqp, { ChannelWrapper } from 'amqp-connection-manager';
 import { SalesService } from 'sales/sales.service';
 import { ConfirmChannel } from 'amqplib';
+import { EmailEvent, EmailService } from 'email/email.service';
 
 export interface SaleEvent {
   price: number;
@@ -33,11 +34,21 @@ export class ConsumerQueuesService implements OnModuleInit {
     try {
       await this.channelWrapper.addSetup(async (channel: ConfirmChannel) => {
         await channel.assertQueue('salesQueue');
+        await channel.assertQueue('emailsQueue');
+
         await channel.consume('salesQueue', async (message) => {
           if (message) {
             const content = JSON.parse(message.content.toString()) as SaleEvent;
             this.logger.log('message received', content);
             await this.salesService.recordSale(content);
+            channel.ack(message);
+          }
+        });
+        await channel.consume('emailsQueue', async (message) => {
+          if (message) {
+            const content = JSON.parse(message.content.toString()) as EmailEvent;
+            this.logger.log('message received', content);
+            await this.salesService.prepareNotifications(content);
             channel.ack(message);
           }
         });
