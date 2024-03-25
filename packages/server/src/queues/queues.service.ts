@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import amqp, { ChannelWrapper } from 'amqp-connection-manager';
 import { Channel } from 'amqplib';
@@ -24,6 +28,8 @@ export interface EmailEvent {
 @Injectable()
 export class ProducerQueuesService {
   private channelWrapper: ChannelWrapper;
+  private readonly logger = new Logger(ProducerQueuesService.name);
+
   constructor(private configService: ConfigService) {
     const connection = amqp.connect([
       this.configService.get<string>('BROKER_URL'),
@@ -42,6 +48,7 @@ export class ProducerQueuesService {
         Buffer.from(JSON.stringify(sale)),
       );
     } catch (error) {
+      this.logger.error(`Could not send sale ${sale} to broker`);
       throw new InternalServerErrorException('Could not record sale');
     }
   }
@@ -65,6 +72,7 @@ export class ProducerQueuesService {
         Buffer.from(JSON.stringify(emailEvent)),
       );
     } catch (error) {
+      this.logger.error(`Could not send notification ${emailEvent} to broker`);
       throw new InternalServerErrorException('Could not notify recipients');
     }
   }
