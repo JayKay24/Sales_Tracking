@@ -8,8 +8,9 @@ import { QueuesModule } from './queues/queues.module';
 import { EmailModule } from './email/email.module';
 import { CommissionModule } from './commission/commission.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { TasksService } from './tasks/tasks.service';
 import { TasksModule } from './tasks/tasks.module';
+import { SaleSchema } from 'sales/sales.schema';
+import { EmailService } from 'email/email.service';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { TasksModule } from './tasks/tasks.module';
       }),
       inject: [ConfigService],
     }),
+    MongooseModule.forFeature([{ name: 'Sale', schema: SaleSchema }]),
     SalesModule,
     QueuesModule,
     EmailModule,
@@ -29,6 +31,6 @@ import { TasksModule } from './tasks/tasks.module';
     TasksModule,
   ],
   controllers: [AppController],
-  providers: [AppService, TasksService],
+  providers: [AppService, EmailService],
 })
 export class AppModule {}
