@@ -14,6 +14,7 @@ class LoginDto {
     type: 'string',
     minLength: 10,
     maxLength: 30,
+    name: 'email',
   })
   @IsEmail()
   @IsNotEmpty()
@@ -27,6 +28,7 @@ class LoginDto {
     type: 'string',
     minLength: 5,
     maxLength: 40,
+    name: 'password',
   })
   @IsString()
   @IsNotEmpty()
@@ -36,7 +38,9 @@ class LoginDto {
 }
 
 class LoginResponse {
-  @ApiProperty()
+  @ApiProperty({
+    name: 'access_token',
+  })
   access_token: string;
 }
 

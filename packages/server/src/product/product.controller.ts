@@ -13,6 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ProductService } from './product.service';
 import { JwtAuthGuard } from 'auth/jwt.guard';
 import {
+  ProductDtoBuy,
   ProductDtoCreate,
   ProductDtoResponse,
   ProductDtoUpdate,
@@ -90,16 +91,16 @@ export class ProductController {
     example: exampleToken,
     required: true,
   })
-  @Post('buy/:id')
+  @UseGuards(JwtAuthGuard)
+  @Post('buy')
   async buyProduct(
-    @Param('id') productId: string,
-    @Body() customerAmount: { amount: number },
+    @Body() customerAmount: ProductDtoBuy,
     @Headers('Authorization') token: string,
   ) {
     const payload = this.extractPayload(token);
     const change = await this.productService.buyProduct(
       payload.email,
-      productId,
+      customerAmount.id,
       customerAmount.amount,
     );
 
@@ -130,7 +131,7 @@ export class ProductController {
     @Body() attributes: ProductDtoUpdate,
     @Headers('Authorization') token: string,
   ) {
-    const payload = await this.extractPayload(token);
+    const payload = this.extractPayload(token);
     const prod = await this.productService.updateProduct(
       payload.email,
       prodId,
@@ -202,7 +203,7 @@ export class ProductController {
     @Param('id') prodId: string,
     @Headers('Authorization') token: string,
   ) {
-    const payload = await this.extractPayload(token);
+    const payload = this.extractPayload(token);
     await this.productService.deleteProduct(payload.email, prodId);
     return null;
   }
