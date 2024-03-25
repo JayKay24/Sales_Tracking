@@ -125,7 +125,7 @@ export class ProductService {
       customerEmail: '',
     };
 
-    const agent = await this.userService.findUserByEmail(product.agent.email);
+    const agent = await this.userService.findUser(product.agent.toString());
 
     sale.price = product.price;
     sale.product = product.name;
