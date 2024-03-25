@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import amqp, { ChannelWrapper } from 'amqp-connection-manager';
 import { Channel } from 'amqplib';
@@ -12,6 +12,13 @@ export interface SaleEvent {
   customer: string;
   agentEmail: string;
   customerEmail: string;
+}
+
+export interface EmailEvent {
+  agentIds: string;
+  message: string;
+  startDate: Date;
+  endDate: Date;
 }
 
 @Injectable()
@@ -35,10 +42,30 @@ export class ProducerQueuesService {
         Buffer.from(JSON.stringify(sale)),
       );
     } catch (error) {
-      throw new HttpException(
-        'Error adding sale to queue',
-        HttpStatus.INTERNAL_SERVER_ERROR,
+      throw new InternalServerErrorException('Could not record sale');
+    }
+  }
+
+  async notifyAgents(
+    recipients: string[],
+    message: string,
+    startDate: Date,
+    endDate: Date,
+  ) {
+    const recipientsString = recipients.join('\n');
+    const emailEvent: EmailEvent = {
+      agentIds: recipientsString,
+      message,
+      startDate,
+      endDate,
+    };
+    try {
+      await this.channelWrapper.sendToQueue(
+        'emailsQueue',
+        Buffer.from(JSON.stringify(emailEvent)),
       );
+    } catch (error) {
+      throw new InternalServerErrorException('Could not notify recipients');
     }
   }
 }
