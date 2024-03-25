@@ -29,6 +29,10 @@ Make sure docker is up and running. Go to your command line and execute the foll
 
 To shut down the application, run `docker-compose down` in the root directory of the project.
 
+## Postman collection
+A postman collection is included at [this](./docs/postman/Sales%20Tracking%20System.postman_collection.json) location. Import it into your postman client and view the endpoints and docs.
+Alternatively, with the application running, visit `http://localhost:4000/api/v1/docs` to view the OpenAPI spec for this application.
+
 ## Architecture
 
 The application uses a microservices arechitecture and splits the workload into two categories:
