@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  rabbitmq_broker:
+    image: rabbitmq:latest
+    ports:
+      - "5672:5672"
+    restart: always
+  sales_database:
+    image: mongo:latest
+    ports:
+      - "3100:27017"
+    volumes:
+      - incourage-olap-data:/data/db
+    restart: always
+
+  server_oltp_database:
+    image: mongo:latest
+    ports:
+      - "3200:27017"
+    volumes:
+      - incourage-oltp-data:/data/db
+    restart: always
+
+  jobs_service:
+    depends_on:
+      - sales_database
+    image: jaykay24/incourage-jobs-docker:1.0.0
+    ports:
+      - "3000:3000"
+    environment:
+      - "JOBS_CONN_STR_LOCAL=${JOBS_CONN_STR_LOCAL}"
+      - "DB_PASSWORD=${DB_PASSWORD}"
+      - "NODE_ENV=${NODE_ENV}"
+      - "BROKER_URL=${BROKER_URL}"
+      - "MAILCHIMP_API_KEY=${MAILCHIMP_API_KEY}"
+    restart: always
+
+  server:
+    depends_on:
+      - server_oltp_database
+    image: jaykay24/incourage-server-docker:1.0.0
+    ports:
+      - "4000:4000"
+    environment:
+      - "CONN_STR_LOCAL=${CONN_STR_LOCAL}"
+      - "JWT_SECRET=${JWT_SECRET}"
+      - "DB_PASSWORD=${DB_PASSWORD}"
+      - "JWT_EXPIRY=${JWT_EXPIRY}"
+      - "NODE_ENV=${NODE_ENV}"
+      - "BROKER_URL=${BROKER_URL}"
+    restart: always
+volumes:
+  incourage-oltp-data:
+  incourage-olap-data:
