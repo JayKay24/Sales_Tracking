@@ -34,7 +34,7 @@ export class UserService {
     phoneNumber: string,
     county: string = '',
   ) {
-    const existingUser = await this.userModel.findOne({ email });
+    const existingUser = await this.findUserByEmail(email);
     if (existingUser) {
       this.logger.error('Failed to register user');
       throw new ConflictException('User with that email already exists');
@@ -158,12 +158,22 @@ export class UserService {
         'Only agents can assign themselves to products to sell. 2 at a time.',
       );
     }
-    const res = await this.productModel
-      .updateMany({ agent: { $eq: null } }, { agent: user })
-      .limit(2)
+    const firstRes = await this.productModel
+      .updateOne({ agent: { $eq: null } }, { agent: user })
       .exec();
 
-    if (!res.acknowledged) {
+    if (!firstRes.acknowledged) {
+      this.logger.error('Failed to assign product to user');
+      throw new InternalServerErrorException(
+        `Could not assign products to the agent of the email, ${email}`,
+      );
+    }
+
+    const secondRes = await this.productModel
+      .updateOne({ agent: { $eq: null } }, { agent: user })
+      .exec();
+
+    if (!secondRes.acknowledged) {
       this.logger.error('Failed to assign product to user');
       throw new InternalServerErrorException(
         `Could not assign products to the agent of the email, ${email}`,
@@ -203,7 +213,12 @@ export class UserService {
       ids.push(agent._id.toString());
     });
 
-    this.producerQueueService.notifyAgents(ids, message, startDate, endDate);
+    await this.producerQueueService.notifyAgents(
+      ids,
+      message,
+      startDate,
+      endDate,
+    );
   }
 
   async findUser(userId: string): Promise<UserDocument> {
@@ -220,11 +235,13 @@ export class UserService {
 
   async findUserByEmail(email): Promise<UserDocument> {
     try {
+      console.log(email);
       const user = await this.userModel.findOne({ email }).exec();
+      console.log(user);
       if (!user) {
+        this.logger.error('Could not find the user with email', email);
         throw new NotFoundException();
       }
-
       return user;
     } catch (error) {
       throw new NotFoundException(`user with email ${email} not found`);
