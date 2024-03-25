@@ -6,6 +6,7 @@ import { UserService } from './user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProductSchema } from 'product/product.schema';
+import { ProducerQueuesService } from 'queues/queues.service';
 
 @Module({
   imports: [
@@ -16,6 +17,6 @@ import { ProductSchema } from 'product/product.schema';
     ]),
   ],
   controllers: [UserController],
-  providers: [UserService, JwtService, ConfigService],
+  providers: [UserService, JwtService, ConfigService, ProducerQueuesService],
 })
 export class UserModule {}
