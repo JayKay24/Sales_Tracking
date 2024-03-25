@@ -3,11 +3,12 @@ import { Model } from 'mongoose';
 import { Sale } from './sales.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { SaleEvent } from 'queues/queues.service';
-import { commissionRate } from 'commission/commission.service';
+import { CommissionService, commissionRate } from 'commission/commission.service';
 
 @Injectable()
 export class SalesService {
-  constructor(@InjectModel('Sale') private readonly saleModel: Model<Sale>) {}
+  constructor(@InjectModel('Sale') private readonly saleModel: Model<Sale>, 
+  private commissionService: CommissionService) {}
 
   async recordSale(content: SaleEvent) {
     const newSale = new this.saleModel({
@@ -19,9 +20,10 @@ export class SalesService {
       customer: content.customer,
       agent_email: content.agentEmail,
       customer_email: content.customerEmail,
-      commissionRate,
+      commission_rate: commissionRate,
     });
     await newSale.save();
+    await this.commissionService.recordCommission(newSale.agent_id, newSale.price);
   }
 
   async getTotalSales(agentId: string, startDate: Date, endDate: Date) {
