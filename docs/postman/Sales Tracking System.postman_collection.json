@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "5c25fa4c-0080-44df-8800-5d0432d14462",
+		"_postman_id": "65480131-10ab-4a4d-b2c8-92b2bc00bc57",
 		"name": "Sales Tracking System",
 		"description": "comprehensive sales\n  tracking system that enables sales agents to record sales, calculate\n  commissions, and receive email notifications containing statements of their\n  sales within a requested period.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -79,9 +79,11 @@
 																	}
 																},
 																"url": {
-																	"raw": "//api/v1/users/admins/notify",
+																	"raw": "{{baseUrl}}/api/v1/users/admins/notify",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
 																	"path": [
-																		"",
 																		"api",
 																		"v1",
 																		"users",
@@ -206,9 +208,11 @@
 															}
 														},
 														"url": {
-															"raw": "//api/v1/users/admins",
+															"raw": "{{baseUrl}}/api/v1/users/admins",
+															"host": [
+																"{{baseUrl}}"
+															],
 															"path": [
-																"",
 																"api",
 																"v1",
 																"users",
@@ -270,8 +274,7 @@
 												}
 											]
 										}
-									],
-									"description": "only users with role = \"admin\""
+									]
 								},
 								{
 									"name": "agents",
@@ -312,9 +315,11 @@
 															}
 														],
 														"url": {
-															"raw": "//api/v1/users/agents",
+															"raw": "{{baseUrl}}/api/v1/users/agents",
+															"host": [
+																"{{baseUrl}}"
+															],
 															"path": [
-																"",
 																"api",
 																"v1",
 																"users",
@@ -437,9 +442,11 @@
 															}
 														},
 														"url": {
-															"raw": "//api/v1/users/:id",
+															"raw": "{{baseUrl}}/api/v1/users/:id",
+															"host": [
+																"{{baseUrl}}"
+															],
 															"path": [
-																"",
 																"api",
 																"v1",
 																"users",
@@ -621,9 +628,11 @@
 													}
 												},
 												"url": {
-													"raw": "//api/v1/users",
+													"raw": "{{baseUrl}}/api/v1/users",
+													"host": [
+														"{{baseUrl}}"
+													],
 													"path": [
-														"",
 														"api",
 														"v1",
 														"users"
@@ -683,8 +692,7 @@
 										}
 									]
 								}
-							],
-							"description": "All user-related operations"
+							]
 						},
 						{
 							"name": "auth",
@@ -752,9 +760,11 @@
 													}
 												},
 												"url": {
-													"raw": "//api/v1/auth",
+													"raw": "{{baseUrl}}/api/v1/auth",
+													"host": [
+														"{{baseUrl}}"
+													],
 													"path": [
-														"",
 														"api",
 														"v1",
 														"auth"
@@ -823,15 +833,62 @@
 									"name": "buy",
 									"item": [
 										{
-											"name": "{id}",
-											"item": [
+											"name": "Product Controller buy Product",
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"amount\": \"<number>\",\n  \"id\": \"<string>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/products/buy",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"products",
+														"buy"
+													]
+												},
+												"description": "customer can buy a product"
+											},
+											"response": [
 												{
-													"name": "Product Controller buy Product",
-													"request": {
+													"name": "cash change from purchase",
+													"originalRequest": {
 														"method": "POST",
-														"header": [],
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"amount\": \"<number>\",\n  \"id\": \"<string>\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
 														"url": {
-															"raw": "{{baseUrl}}/api/v1/products/buy/:id",
+															"raw": "{{baseUrl}}/api/v1/products/buy",
 															"host": [
 																"{{baseUrl}}"
 															],
@@ -839,112 +896,96 @@
 																"api",
 																"v1",
 																"products",
-																"buy",
-																":id"
-															],
-															"variable": [
-																{
-																	"key": "id",
-																	"value": "<string>",
-																	"description": "(Required) "
-																}
+																"buy"
 															]
-														},
-														"description": "customer can buy a product"
-													},
-													"response": [
-														{
-															"name": "cash change from purchase",
-															"originalRequest": {
-																"method": "POST",
-																"header": [],
-																"url": {
-																	"raw": "//api/v1/products/buy/:id",
-																	"path": [
-																		"",
-																		"api",
-																		"v1",
-																		"products",
-																		"buy",
-																		":id"
-																	],
-																	"variable": [
-																		{
-																			"key": "id"
-																		}
-																	]
-																}
-															},
-															"status": "OK",
-															"code": 200,
-															"_postman_previewlanguage": "text",
-															"header": [],
-															"cookie": [],
-															"body": ""
-														},
-														{
-															"name": "Only customers can buy products",
-															"originalRequest": {
-																"method": "POST",
-																"header": [],
-																"url": {
-																	"raw": "{{baseUrl}}/api/v1/products/buy/:id",
-																	"host": [
-																		"{{baseUrl}}"
-																	],
-																	"path": [
-																		"api",
-																		"v1",
-																		"products",
-																		"buy",
-																		":id"
-																	],
-																	"variable": [
-																		{
-																			"key": "id"
-																		}
-																	]
-																}
-															},
-															"status": "Forbidden",
-															"code": 403,
-															"_postman_previewlanguage": "text",
-															"header": [],
-															"cookie": [],
-															"body": ""
-														},
-														{
-															"name": "Product with id {productId} not found",
-															"originalRequest": {
-																"method": "POST",
-																"header": [],
-																"url": {
-																	"raw": "{{baseUrl}}/api/v1/products/buy/:id",
-																	"host": [
-																		"{{baseUrl}}"
-																	],
-																	"path": [
-																		"api",
-																		"v1",
-																		"products",
-																		"buy",
-																		":id"
-																	],
-																	"variable": [
-																		{
-																			"key": "id"
-																		}
-																	]
-																}
-															},
-															"status": "Not Found",
-															"code": 404,
-															"_postman_previewlanguage": "text",
-															"header": [],
-															"cookie": [],
-															"body": ""
 														}
-													]
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												},
+												{
+													"name": "Only customers can buy products",
+													"originalRequest": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"amount\": \"<number>\",\n  \"id\": \"<string>\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/products/buy",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"products",
+																"buy"
+															]
+														}
+													},
+													"status": "Forbidden",
+													"code": 403,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												},
+												{
+													"name": "Product with id {productId} not found",
+													"originalRequest": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"amount\": \"<number>\",\n  \"id\": \"<string>\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/products/buy",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"products",
+																"buy"
+															]
+														}
+													},
+													"status": "Not Found",
+													"code": 404,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
 												}
 											]
 										}
@@ -1024,9 +1065,11 @@
 															}
 														},
 														"url": {
-															"raw": "//api/v1/products/:id",
+															"raw": "{{baseUrl}}/api/v1/products/:id",
+															"host": [
+																"{{baseUrl}}"
+															],
 															"path": [
-																"",
 																"api",
 																"v1",
 																"products",
@@ -1143,9 +1186,11 @@
 															}
 														],
 														"url": {
-															"raw": "//api/v1/products/:id",
+															"raw": "{{baseUrl}}/api/v1/products/:id",
+															"host": [
+																"{{baseUrl}}"
+															],
 															"path": [
-																"",
 																"api",
 																"v1",
 																"products",
@@ -1244,9 +1289,11 @@
 															}
 														],
 														"url": {
-															"raw": "//api/v1/products/agent",
+															"raw": "{{baseUrl}}/api/v1/products/agent",
+															"host": [
+																"{{baseUrl}}"
+															],
 															"path": [
-																"",
 																"api",
 																"v1",
 																"products",
@@ -1358,9 +1405,11 @@
 													}
 												},
 												"url": {
-													"raw": "//api/v1/products",
+													"raw": "{{baseUrl}}/api/v1/products",
+													"host": [
+														"{{baseUrl}}"
+													],
 													"path": [
-														"",
 														"api",
 														"v1",
 														"products"
@@ -1493,9 +1542,11 @@
 													}
 												],
 												"url": {
-													"raw": "//api/v1/products",
+													"raw": "{{baseUrl}}/api/v1/products",
+													"host": [
+														"{{baseUrl}}"
+													],
 													"path": [
-														"",
 														"api",
 														"v1",
 														"products"
@@ -1519,10 +1570,9 @@
 							]
 						}
 					],
-					"description": "Version"
+					"description": "Version1 of API"
 				}
-			],
-			"description": "BaseName"
+			]
 		}
 	],
 	"variable": [
