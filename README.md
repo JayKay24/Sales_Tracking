@@ -40,6 +40,8 @@ The application uses a microservices arechitecture and splits the workload into 
 2. OLAP - These are the background jobs required to fulfill application requirments that will require long-running calculations e.g calculating agent
   commissions and unpaid commissions within a given date range, sending emails to agents etc.
 
+Also, this repository is structured as a [monorepo](https://lerna.js.org/) to run tests in parallel and to keep all services under one repository.
+
 ### Diagrams
 #### Backend
 ![Backend](./docs/diagrams/backend_architecture.png)
