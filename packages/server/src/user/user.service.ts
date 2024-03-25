@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
@@ -16,6 +17,7 @@ import { ProducerQueuesService } from 'queues/queues.service';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
   constructor(
     @InjectModel('Product') private readonly productModel: Model<Product>,
     @InjectModel('User') private readonly userModel: Model<User>,
@@ -33,6 +35,7 @@ export class UserService {
   ) {
     const existingUser = await this.userModel.findOne({ email });
     if (existingUser) {
+      this.logger.error('Failed to register user');
       throw new ConflictException('User with that email already exists');
     }
     const hashedPassword = await bcrypt.hash(password, saltOrRounds);
@@ -71,6 +74,7 @@ export class UserService {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       currentUser = await this.findUser(userId);
     } catch (error) {
+      this.logger.error('Failed to register an agent', error);
       throw new NotFoundException('Only admins allowed to add agents');
     }
 
@@ -137,6 +141,7 @@ export class UserService {
         county: user.county,
       };
     } catch (error) {
+      this.logger.error('Failed to update user', error);
       if (error instanceof ForbiddenException) {
         throw new ForbiddenException('You can only modify your own data');
       }
@@ -147,6 +152,7 @@ export class UserService {
   async assignProducts(email: string) {
     const user = await this.findUserByEmail(email);
     if (user.role !== UserRole.AGENT) {
+      this.logger.error('Failed to assign product to user');
       throw new ForbiddenException(
         'Only agents can assign themselves to products to sell. 2 at a time.',
       );
@@ -157,6 +163,7 @@ export class UserService {
       .exec();
 
     if (!res.acknowledged) {
+      this.logger.error('Failed to assign product to user');
       throw new InternalServerErrorException(
         `Could not assign products to the agent of the email, ${email}`,
       );
@@ -183,6 +190,7 @@ export class UserService {
   ) {
     const user = await this.findUser(email);
     if (user.role !== UserRole.ADMIN) {
+      this.logger.error('Failed to notify agents');
       throw new ForbiddenException(
         'Only admins can notify agents of sales records and commissions earned',
       );
