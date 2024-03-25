@@ -7,10 +7,14 @@ import { SalesModule } from './sales/sales.module';
 import { QueuesModule } from './queues/queues.module';
 import { EmailModule } from './email/email.module';
 import { CommissionModule } from './commission/commission.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TasksService } from './tasks/tasks.service';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    ScheduleModule.forRoot(),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -22,8 +26,9 @@ import { CommissionModule } from './commission/commission.module';
     QueuesModule,
     EmailModule,
     CommissionModule,
+    TasksModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, TasksService],
 })
 export class AppModule {}
