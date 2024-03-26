@@ -199,7 +199,7 @@ export class UserService {
     startDate: Date,
     endDate: Date,
   ) {
-    const user = await this.findUser(email);
+    const user = await this.findUserByEmail(email);
     if (user.role !== UserRole.ADMIN) {
       this.logger.error('Failed to notify agents');
       throw new ForbiddenException(
@@ -207,7 +207,7 @@ export class UserService {
       );
     }
 
-    const agents = await this.userModel.find({}).exec();
+    const agents = await this.userModel.find({ role: UserRole.AGENT }).exec();
     const ids: string[] = [];
     agents.forEach((agent) => {
       ids.push(agent._id.toString());
