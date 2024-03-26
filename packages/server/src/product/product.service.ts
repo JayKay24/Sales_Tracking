@@ -101,48 +101,70 @@ export class ProductService {
       throw new ForbiddenException('Only customers can buy products');
     }
 
-    const product = await this.productModel.findById(productId).exec();
+    const session = await this.productModel.startSession();
+    session.startTransaction();
 
-    if (!product) {
-      this.logger.error(`Failed to buy product with id ${productId}`);
-      throw new NotFoundException(`Product with id ${productId} not found`);
+    try {
+      this.logger.log(`Start transaction ${session}`);
+      const product = await this.productModel
+        .findById(productId)
+        .session(session)
+        .exec();
+
+      if (!product) {
+        this.logger.error(`Failed to buy product with id ${productId}`);
+        throw new NotFoundException(`Product with id ${productId} not found`);
+      }
+
+      if (amount < product.price) {
+        this.logger.error(`Failed to buy product with amount ${amount}`);
+        throw new BadRequestException('Payment is too low');
+      }
+
+      // Before delete, raise sale event
+      const sale: SaleEvent = {
+        price: 0,
+        product: '',
+        agent: '',
+        agentId: '',
+        customerId: '',
+        customer: '',
+        agentEmail: '',
+        customerEmail: '',
+      };
+
+      const agent = await this.userService.findUser(product.agent.toString());
+
+      sale.price = product.price;
+      sale.product = product.name;
+      sale.agent = `${agent.first_name} ${agent.last_name}`;
+      sale.agentId = agent._id.toString();
+      sale.customerId = user._id.toString();
+      sale.customer = `${user.first_name} ${user.last_name}`;
+      sale.agentEmail = agent.email;
+      sale.customerEmail = user.email;
+
+      await this.producerQueuesService.addToSalesQueue(sale);
+
+      await this.productModel
+        .findByIdAndDelete(productId)
+        .session(session)
+        .exec();
+
+      await session.commitTransaction();
+
+      this.logger.log(`Transaction committed successfully, ${session}`);
+
+      return {
+        change: amount - product.price,
+      };
+    } catch (error) {
+      await session.abortTransaction();
+      this.logger.error('Transaction rolled back', error);
+      throw error;
+    } finally {
+      session.endSession();
     }
-
-    if (amount < product.price) {
-      this.logger.error(`Failed to buy product with amount ${amount}`);
-      throw new BadRequestException('Payment is too low');
-    }
-
-    // Before delete, raise sale event
-    const sale: SaleEvent = {
-      price: 0,
-      product: '',
-      agent: '',
-      agentId: '',
-      customerId: '',
-      customer: '',
-      agentEmail: '',
-      customerEmail: '',
-    };
-
-    const agent = await this.userService.findUser(product.agent.toString());
-
-    sale.price = product.price;
-    sale.product = product.name;
-    sale.agent = `${agent.first_name} ${agent.last_name}`;
-    sale.agentId = agent._id.toString();
-    sale.customerId = user._id.toString();
-    sale.customer = `${user.first_name} ${user.last_name}`;
-    sale.agentEmail = agent.email;
-    sale.customerEmail = user.email;
-
-    await this.producerQueuesService.addToSalesQueue(sale);
-
-    await this.productModel.findByIdAndDelete(productId);
-
-    return {
-      change: amount - product.price,
-    };
   }
 
   async updateProduct(
