@@ -47,7 +47,7 @@ export class CommissionService {
     const commissions = await this.commissionModel
       .find({
         agent_id: agentId,
-        createdAt: { $gte: startDate.getTime(), $lte: endDate.getTime() },
+        createdAt: { $gte: startDate, $lte: endDate },
       })
       .exec();
 
