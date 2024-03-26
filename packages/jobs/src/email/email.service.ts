@@ -1,6 +1,6 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as Mailchimp from '@mailchimp/mailchimp_transactional';
+import * as SibApiV3Sdk from '@getbrevo/brevo';
 
 export interface EmailEvent {
   agentIds: string;
@@ -11,32 +11,26 @@ export interface EmailEvent {
 
 @Injectable()
 export class EmailService {
-  private client: Mailchimp.ApiClient;
+  private apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+  private logger = new Logger(EmailService.name);
   constructor(private configService: ConfigService) {
-    this.client = Mailchimp(
-      this.configService.get<string>('MAILCHIMP_API_KEY'),
+    this.apiInstance.setApiKey(
+      SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey,
+      this.configService.get<string>('BREVO_API_KEY'),
     );
   }
 
   async sendEmail(email: string, subject: string, body: string) {
-    // try {
-    //   const message = {
-    //     from_email: this.configService.get<string>('FROM_EMAIL'),
-    //     subject,
-    //     text: body,
-    //     to: [
-    //       {
-    //         email,
-    //         type: 'to',
-    //       },
-    //     ],
-    //   };
+    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+    sendSmtpEmail.params = { body, subject };
+    sendSmtpEmail.subject = '{{params.subject}}';
 
-    //   // await this.client.messages.send({ message });
-    // } catch (error) {
-    //   throw new InternalServerErrorException('Failed to send email');
-    // }
-
-    console.log('sending emails now', email, subject, body);
+    try {
+      this.logger.log(`sending emails now...${email}, ${subject} ${body}`);
+      const data = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
+      this.logger.log('Email API called successfully. Returned data:', data);
+    } catch (error) {
+      this.logger.error('Failed to send email to email service', error);
+    }
   }
 }
