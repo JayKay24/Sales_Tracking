@@ -44,7 +44,7 @@ export class SalesService {
     const sales: SaleDocument[] = await this.saleModel
       .find({
         agent_id: agentId,
-        createdAt: { $gte: startDate.getTime(), $lte: endDate.getTime() },
+        createdAt: { $gte: startDate, $lte: endDate },
       })
       .exec();
     return [sales, sales.reduce((accum, val) => accum + val.price, 0)];
@@ -58,20 +58,22 @@ export class SalesService {
         new Date(content.startDate),
         new Date(content.endDate),
       );
-      const email = sales[0].agent_email;
-      const totalCommission =
-        await this.commissionService.getTotalCommissionsBetweenDates(
-          agentId,
-          new Date(content.startDate),
-          new Date(content.endDate),
-        );
+      if (sales.length > 0) {
+        const email = sales[0].agent_email;
+        const totalCommission =
+          await this.commissionService.getTotalCommissionsBetweenDates(
+            agentId,
+            new Date(content.startDate),
+            new Date(content.endDate),
+          );
 
-      await this.emailService.sendEmail(
-        email,
-        `Sales between ${content.startDate} and ${content.endDate}`,
-        content.message +
-          `\nTotal Sales: ${totalSales}\nTotal Commission: ${totalCommission}`,
-      );
+        await this.emailService.sendEmail(
+          email,
+          `Sales between ${content.startDate} and ${content.endDate}`,
+          content.message +
+            `\nTotal Sales: ${totalSales}\nTotal Commission: ${totalCommission}`,
+        );
+      }
     });
   }
 }

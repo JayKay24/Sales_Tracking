@@ -193,7 +193,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Post('admins/notify')
   async notifyAgents(
-    @Headers() token: string,
+    @Headers('Authorization') token: string,
     @Body() notification: EmailNotificationDto,
   ) {
     const payload = this.extractPayload(token);
