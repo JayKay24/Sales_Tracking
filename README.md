@@ -5,14 +5,14 @@ comprehensive sales tracking system that enables sales agents to record sales, c
 To install and run the application locally, make sure to have the following dependencies:
 
 1. [Docker](https://www.docker.com/) ~25.0.3
-2. Register an API key with Mailchimp.
+2. Register an API key with [Brevo](https://developers.brevo.com/).
 
 ## Installation
 
 Make sure docker is up and running. Go to your command line and execute the following instructions:
 1. `$ git clone https://github.com/JayKay24/Sales_Tracking.git`
 2. `$ cd Sales_Tracking`
-3. Create an `.env` with the following keys:
+3. Create a `.env` with the following keys:
   ```
   JOBS_CONN_STR_LOCAL="mongodb://sales_database:27017/inc_olap"
   DB_PASSWORD="<ANY PASSWORD WILL DO>"
@@ -21,7 +21,7 @@ Make sure docker is up and running. Go to your command line and execute the foll
   NODE_ENV="development"
   JWT_EXPIRY="1d"
   BROKER_URL="amqp://rabbitmq_broker:5672"
-  MAILCHIMP_API_KEY="<YOUR MAILCHIMP_API_KEY>"
+  BREVO_API_KEY="<YOUR BREVO_API_KEY>"
   FROM_EMAIL="<YOUR email sending domain e.g bruce@yourdomain.com>"
   ```
 4. `$ docker-compose up`
