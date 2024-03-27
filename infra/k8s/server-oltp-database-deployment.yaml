@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-oltp-database
+spec:
+  selector:
+    matchLabels:
+      app: server-oltp-database
+  template:
+    metadata:
+      labels:
+        app: server-oltp-database
+    spec:
+      containers:
+      - name: server-oltp-database
+        image: mongo:latest
+        ports:
+        - containerPort: 27017
+          name: server-oltp-db
+

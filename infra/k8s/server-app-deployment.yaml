@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-app
+spec:
+  selector:
+    matchLabels:
+      app: server-app
+  template:
+    metadata:
+      labels:
+        app: server-app
+    spec:
+      containers:
+      - name: server-app
+        image: jaykay24/incourage-jobs-docker:1.0.0
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 4000
+          name: server
+        envFrom:
+        - secretRef:
+            name: server-app-secret

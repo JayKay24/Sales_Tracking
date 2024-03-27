@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sales-database
+spec:
+  selector:
+    matchLabels:
+      app: sales-database
+  template:
+    metadata:
+      labels:
+        app: sales-database
+    spec:
+      containers:
+      - name: sales-database
+        image: mongo:latest
+        ports:
+        - containerPort: 27017
+          name: sales-db
+

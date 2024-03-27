@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sales-database-service
+spec:
+  selector:
+    app: sales-database
+  type: LoadBalancer
+  ports:
+  - port: 3100
+    targetPort: 27017
+    protocol: TCP
