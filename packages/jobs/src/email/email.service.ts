@@ -13,17 +13,38 @@ export interface EmailEvent {
 export class EmailService {
   private apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
   private logger = new Logger(EmailService.name);
+  private sender = '';
   constructor(private configService: ConfigService) {
     this.apiInstance.setApiKey(
       SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey,
       this.configService.get<string>('BREVO_API_KEY'),
     );
+    this.sender = this.configService.get<string>('EMAIL_SENDER');
   }
 
   async sendEmail(email: string, subject: string, body: string) {
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+    sendSmtpEmail.htmlContent = `
+      <html>
+        <body>
+          <h3>{{params.subject}}</h3>
+          <p>{{params.body}}</p>
+          </p>
+        </body>
+        </body>
+      </html>
+      `;
     sendSmtpEmail.params = { body, subject };
-    sendSmtpEmail.subject = '{{params.subject}}';
+    sendSmtpEmail.subject = `${subject}`;
+    sendSmtpEmail.sender = {
+      email: this.sender,
+      name: 'Incourage Sales Tracking',
+    };
+    sendSmtpEmail.replyTo = {
+      email: this.sender,
+      name: 'Incourage Sales Tracking',
+    };
+    sendSmtpEmail.to = [{ email }];
 
     try {
       this.logger.log(`sending emails now...${email}, ${subject} ${body}`);

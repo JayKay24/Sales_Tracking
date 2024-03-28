@@ -35,6 +35,7 @@ services:
       - "BROKER_URL=${BROKER_URL}"
       - "BREVO_API_KEY=${BREVO_API_KEY}"
       - "JOBS_CONN_STR_PROD=${JOBS_CONN_STR_PROD}"
+      - "EMAIL_SENDER=${EMAIL_SENDER}"
     restart: always
 
   server:
