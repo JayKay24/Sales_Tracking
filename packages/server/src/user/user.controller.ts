@@ -173,6 +173,10 @@ export class UserController {
   }
 
   @ApiResponse({
+    description: 'startDate must be earlier than endDate',
+    status: 400,
+  })
+  @ApiResponse({
     description: 'user with email {email} not found',
     status: 404,
   })
