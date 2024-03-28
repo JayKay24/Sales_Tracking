@@ -34,6 +34,7 @@ services:
       - "NODE_ENV=${NODE_ENV}"
       - "BROKER_URL=${BROKER_URL}"
       - "BREVO_API_KEY=${BREVO_API_KEY}"
+      - "JOBS_CONN_STR_PROD=${JOBS_CONN_STR_PROD}"
     restart: always
 
   server:
@@ -49,6 +50,7 @@ services:
       - "JWT_EXPIRY=${JWT_EXPIRY}"
       - "NODE_ENV=${NODE_ENV}"
       - "BROKER_URL=${BROKER_URL}"
+      - "CONN_STR_PROD=${CONN_STR_PROD}"
     restart: always
 volumes:
   incourage-oltp-data:
