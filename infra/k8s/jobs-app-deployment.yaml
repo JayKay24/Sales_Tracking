@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jobs-app
+spec:
+  selector:
+    matchLabels:
+      app: jobs-app
+  template:
+    metadata:
+      labels:
+        app: jobs-app
+    spec:
+      containers:
+      - name: jobs-app
+        image: jaykay24/incourage-jobs-docker:1.0.0
+        ports:
+        - containerPort: 3000
+          name: jobs
+        envFrom:
+        - secretRef:
+            name: jobs-app-secret
+

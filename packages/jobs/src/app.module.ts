@@ -12,15 +12,21 @@ import { TasksModule } from './tasks/tasks.module';
 import { SaleSchema } from 'sales/sales.schema';
 import { EmailService } from 'email/email.service';
 
+async function getDbConnString(configService: ConfigService) {
+  const env = configService.get<string>('NODE_ENV');
+  if (env === 'production') {
+    return { uri: configService.get<string>('JOBS_CONN_STR_PROD') };
+  }
+  return { uri: configService.get<string>('JOBS_CONN_STR_LOCAL') };
+}
+
 @Module({
   imports: [
     ConfigModule.forRoot(),
     ScheduleModule.forRoot(),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('JOBS_CONN_STR_LOCAL'),
-      }),
+      useFactory: getDbConnString,
       inject: [ConfigService],
     }),
     MongooseModule.forFeature([{ name: 'Sale', schema: SaleSchema }]),

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
@@ -199,6 +200,10 @@ export class UserService {
     startDate: Date,
     endDate: Date,
   ) {
+    if (startDate > endDate) {
+      throw new BadRequestException('startDate must be earlier than endDate');
+    }
+
     const user = await this.findUserByEmail(email);
     if (user.role !== UserRole.ADMIN) {
       this.logger.error('Failed to notify agents');
